@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 typedef unsigned int uint;
 
@@ -64,6 +65,8 @@ private:
 
     char groupBegin;
     char groupEnd;
+
+    std::stringstream output;
 
 
 	///the main data storage

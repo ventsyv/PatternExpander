@@ -182,53 +182,61 @@ inline bool Expander::isEscSeq(const std::string& pattern, uint position) const
 
 std::string Expander::expand(const std::string& pattern)
 {
-	uint size = pattern.length();
-	string result;
+    int size = pattern.length();
+    string result;
+    string expanded;
 
-	int position = pattern.find(rangeSymbol);
-    if (position < 0)
-        result = pattern;
-
-	while ( position >= 0)
-	{
-		if (!isEscSeq(pattern, position)) {
-
-            // A valid range symbol will have left and right operands
-            if (position - 1 < 0 || position + 1 >= size)
+    for (int i = 0; i < size; i++)
+    {
+        if (isEscSeq(pattern, i))
+        {
+            i++;
+            continue;
+        }
+        else if (pattern[i] == rangeSymbol) //range symbol reached
+        {
+            if (i - 1 < 0 || i + 1 >= size)
                 return "";
+            else if (!isEscSeq(pattern, i)) //the character was not escaped
+            {
+                string preStr = pattern.substr(0, i - 1); //the presiding str
+                string postStr = pattern.substr(i + 2, size - (i + 2)); //the rest of the original str
 
-            //the preceeding string
-            string preStr = pattern.substr(0, position - 1);
-            //the rest of the original str
-            string postStr = pattern.substr(position + 2, size - (position + 2));
+                char startRange = pattern[i - 1];
+                char endRange = pattern[i + 1];
 
-            char startRange = pattern[position - 1];
-            char endRange = pattern[position + 1];
-
-            //if both are alphabetical characters
-            if ((isalpha(startRange) && isalpha(endRange))
-                || (isdigit(startRange) && isdigit(endRange))) {
-                if (static_cast<uint>(startRange) < static_cast<uint>(endRange)) //inorder
+                //if both are alphabetical characters
+                if ((isalpha(startRange) && isalpha(endRange))
+                    || (isdigit(startRange) && isdigit(endRange)))
                 {
-                    for (uint j = static_cast<uint>(startRange); j <= static_cast<uint>(endRange); j++) {
-                        result += (char) j;
+                    if ((int) startRange < (int) endRange) //inorder
+                    {
+                        for (int j = startRange; j <= endRange; j++)
+                        {
+                            expanded += (char) j;
+                        }
                     }
-                } else //reverse order
-                {
-                    for (uint j = static_cast<uint>(startRange); j >= static_cast<uint>(endRange); j--) {
-                        result += (char) j;
+                    else //reverse order
+                    {
+                        for (int j = startRange; j >= endRange; j--)
+                        {
+                            expanded += (char) j;
+                        }
                     }
                 }
-            } else
-                return ""; //range does not seem valid
-
-            result = preStr + result + postStr;
-            size = pattern.length();
-            //Search the rest of the original pattern
-            position = pattern.find(rangeSymbol, preStr.length() + result.length());
+                else
+                    return ""; //range does not seem valid
+                result = preStr + expanded + postStr;
+                size = pattern.length();
+                i += 2;
+            }
         }
-	} //end while
-	return result;
+        //result = "";
+    } //end for
+
+    if (result == "")
+        result = pattern;
+    return result;
 }
 
 
@@ -242,9 +250,9 @@ bool Expander::validate(const string& pattern)
 	{
 		if (pattern[i] == escapeSymbol) {
             if (!isEscSeq(pattern, i)) {
-                cerr << "Error: Invalid escape sequence detected" << endl;
-                cerr << pattern << endl;
-                cerr << std::setw(i) << "^" << endl;
+                output << "Error: Invalid escape sequence detected" << endl;
+                output << pattern << endl;
+                output << std::setw(i) << "^" << endl;
                 return false;
             }
             else
@@ -263,9 +271,9 @@ bool Expander::validate(const string& pattern)
 
             if (loadBrackets < 0)
             {
-                cerr << "Error: Invalid group sequence detected" << endl;
-                cerr << pattern << endl;
-                cerr << std::setw(i) << "^" << endl;
+                output << "Error: Invalid group sequence detected" << endl;
+                output << pattern << endl;
+                output << std::setw(i) << "^" << endl;
                 return false;
             }
 
