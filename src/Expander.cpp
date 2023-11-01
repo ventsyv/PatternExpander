@@ -39,11 +39,11 @@ void Expander::generate(const string &pattern)
                 continue;
             }
 
-        } else if (expandedPattern[i] == '[' && !escSeqReached) {
+        } else if (expandedPattern[i] == groupBegin && !escSeqReached) {
             isFirstInGroup = true;
             load++;
             continue;
-        } else if (expandedPattern[i] == ']' && !escSeqReached) {
+        } else if (expandedPattern[i] == groupEnd && !escSeqReached) {
             load--;
             continue;
         }
@@ -108,7 +108,7 @@ uint Expander::getBlockElements(const string& pattern, uint& start,
 	//Find the end of the block
 	while (currentIndx >= 0) //we are going backwards
 	{
-		if (pattern[currentIndx] == '[' || pattern[currentIndx] == ']')
+		if (pattern[currentIndx] == groupBegin || pattern[currentIndx] == groupEnd)
 			break; //reached the end of the block
 		currentIndx--;
 	}
