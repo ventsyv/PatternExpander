@@ -29,8 +29,8 @@ build: $(OBJECTS) src/main.o
 	g++ $(OBJECTS) src/main.o -o bin/$(EXE_FILE)
 	
 clean:
-	find . -name "*.o" -delete
-	rm bin/*
+	@find . -name "*.o" -delete
+	@rm bin/* 2> /dev/null || true
 
 
 test: $(OBJECTS) $(TEST_OBJS)
