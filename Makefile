@@ -22,7 +22,7 @@ test/%.o: test/%.cpp
 	g++ $(FLAGS) $(TEST_FLAGS) $(CXXFLAGS) $< -o $@
 
 
-.PHONY: default clean test
+.PHONY: .default clean build test
 .default: build
 
 build: $(OBJECTS) src/main.o
