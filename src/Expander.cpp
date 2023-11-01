@@ -71,6 +71,9 @@ void Expander::generate(const string &pattern)
 			if (isFirstInGroup)
 			{
 				partials = results;
+                //The variable block is not optional, so we need to clear the result set
+                //For example: 1[a-c] is expected to produce 1a, 1b, 1c
+                //Without the clear, it produces 1, 1a, 1b, 1c
                 results.clear();
 				isFirstInGroup = false;
 			}
