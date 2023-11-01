@@ -37,6 +37,7 @@ clean:
 
 test: $(OBJECTS) $(TEST_OBJS)
 	g++ $(TEST_FLAGS) $(OBJECTS) $(TEST_OBJS) -lgtest -Lgoogletest/build/lib -o bin/unittests
+	bin/unittests
 
 install: build
 	sudo cp ./bin/$(EXE_FILE) /usr/local/bin/
