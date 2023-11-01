@@ -26,7 +26,7 @@ test/%.o: test/%.cpp
 .default: build
 
 build: $(OBJECTS) src/main.o
-	g++ $(OBJECTS) -o bin/$(EXE_FILE)
+	g++ $(OBJECTS) src/main.o -o bin/$(EXE_FILE)
 	
 clean:
 	find . -name "*.o" -delete
