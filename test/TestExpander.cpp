@@ -145,17 +145,17 @@ TEST_F(TestExpander, testGenerate_VariableBlock) {
     underTest.generate(pattern);
     auto data = underTest.getData();
     EXPECT_EQ(data.size(), 3);
-    EXPECT_EQ(data[1], "a");
-    EXPECT_EQ(data[2], "b");
-    EXPECT_EQ(data[3], "c");
+    EXPECT_EQ(data[0], "a");
+    EXPECT_EQ(data[1], "b");
+    EXPECT_EQ(data[2], "c");
 
     pattern = "1[a-c]";
     underTest.generate(pattern);
     data = underTest.getData();
     EXPECT_EQ(data.size(), 3);
-    EXPECT_EQ(data[1], "1a");
-    EXPECT_EQ(data[2], "1b");
-    EXPECT_EQ(data[3], "1c");
+    EXPECT_EQ(data[0], "1a");
+    EXPECT_EQ(data[1], "1b");
+    EXPECT_EQ(data[2], "1c");
 
 }
 
