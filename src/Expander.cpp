@@ -58,7 +58,7 @@ void Expander::generate(const string &pattern)
 			} else //variations are present.
 			{
 				//add the constant character to all variations
-				//No need to resize, not adding new items, just adding const. char. to current patterns
+				//Just appending the constant character to all patterns
 				for (uint j = 0; j < currentItem; j++)
 				{
 					results[j] = results[j] + pattern[i];
@@ -66,17 +66,24 @@ void Expander::generate(const string &pattern)
 			}
 		} else if (load > 0) //character inside a variable block
 		{
-			//handleVariableBlock(pattern, (uint) i, currentItem);
+			//when we first enter the variable block, we save the
+            //existing patterns
 			if (isFirstInGroup)
 			{
 				partials = results;
+                results.clear();
 				isFirstInGroup = false;
 			}
 
+            //It's possible the variable block appears first in the pattern
+            //That means that the result set is empty
+            //If that's the case, just add the first item from the varible block
             if (partials.empty())
                 results.push_back(string(1,expandedPattern[i]));
             else {
-
+                //The result set is not empty
+                //Append the first item of the variable block to the existing patterns,
+                //then add it the result set.
                 for (uint item = 0; item < partials.size(); item++) {
                     results.push_back(partials[item] + expandedPattern[i]);
                 }
