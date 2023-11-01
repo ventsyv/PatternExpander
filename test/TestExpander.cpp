@@ -112,33 +112,54 @@ TEST_F(TestExpander, testGenerate_StaticBlock)
     underTest.generate(pattern);
     auto data = underTest.getData();
     EXPECT_EQ(data.size(), 1);
-    EXPECT_EQ(data[1], pattern);
+    EXPECT_EQ(data[0], pattern);
 
     pattern = "abc/[d";
     underTest.generate(pattern);
     data = underTest.getData();
     EXPECT_EQ(data.size(), 1);
-    EXPECT_EQ(data[1], "abc[d");
+    EXPECT_EQ(data[0], "abc[d");
 
     pattern = "abc/]d";
     underTest.generate(pattern);
     data = underTest.getData();
     EXPECT_EQ(data.size(), 1);
-    EXPECT_EQ(data[1], "abc]d");
+    EXPECT_EQ(data[0], "abc]d");
 
     pattern = "abc/-d";
     underTest.generate(pattern);
     data = underTest.getData();
     EXPECT_EQ(data.size(), 1);
-    EXPECT_EQ(data[1], "abc-d");
+    EXPECT_EQ(data[0], "abc-d");
 
     pattern = "abc//d";
     underTest.generate(pattern);
     data = underTest.getData();
     EXPECT_EQ(data.size(), 1);
-    EXPECT_EQ(data[1], "abc/d");
+    EXPECT_EQ(data[0], "abc/d");
 
 }
+
+TEST_F(TestExpander, testGenerate_VariableBlock) {
+    string pattern = "[a-c]";
+    underTest.generate(pattern);
+    auto data = underTest.getData();
+    EXPECT_EQ(data.size(), 3);
+    EXPECT_EQ(data[1], "a");
+    EXPECT_EQ(data[2], "b");
+    EXPECT_EQ(data[3], "c");
+
+    pattern = "1[a-c]";
+    underTest.generate(pattern);
+    data = underTest.getData();
+    EXPECT_EQ(data.size(), 3);
+    EXPECT_EQ(data[1], "1a");
+    EXPECT_EQ(data[2], "1b");
+    EXPECT_EQ(data[3], "1c");
+
+}
+
+
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
