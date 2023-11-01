@@ -60,87 +60,106 @@ TEST_F(TestExpander, testValidation_valid)
     EXPECT_TRUE(result);
 }
 
-TEST_F(TestExpander, testValidation_validEscSeqs)
-{
+TEST_F(TestExpander, testValidation_validEscSeqs_Dash) {
     //A pattern with valid escape seq
     string pattern = "abc/-d";
     bool result = underTest.validate(pattern);
     EXPECT_TRUE(result);
+}
 
+TEST_F(TestExpander, testValidation_validEscSeqs_GroupBegin) {
     //A pattern with valid escape seq
-    pattern = "abc/[d";
-    result = underTest.validate(pattern);
-    EXPECT_TRUE(result);
-
-    //A pattern with valid escape seq
-    pattern = "abc//d";
-    result = underTest.validate(pattern);
-    EXPECT_TRUE(result);
-
-    //A pattern with valid escape seq
-    pattern = "abc/]d";
-    result = underTest.validate(pattern);
-    EXPECT_TRUE(result);
-
-    //A pattern with valid escape seq
-    pattern = "abc\"de\"";
-    result = underTest.validate(pattern);
+    string pattern = "abc/[d";
+    bool result = underTest.validate(pattern);
     EXPECT_TRUE(result);
 }
 
-TEST_F(TestExpander, testValidation_invalidGroups)
-{
+TEST_F(TestExpander, testValidation_validEscSeqs_GroupEnd) {
+    //A pattern with valid escape seq
+    string pattern = "abc/]d";
+    bool result = underTest.validate(pattern);
+    EXPECT_TRUE(result);
+}
+
+TEST_F(TestExpander, testValidation_validEscSeqs_EscChar) {
+    //A pattern with valid escape seq
+    string pattern = "abc//d";
+    bool result = underTest.validate(pattern);
+    EXPECT_TRUE(result);
+}
+
+TEST_F(TestExpander, testValidation_validEscSeqs_Quotes) {
+    //A pattern with valid escape seq
+    string pattern = "abc\"de\"";
+    bool result = underTest.validate(pattern);
+    EXPECT_TRUE(result);
+}
+
+TEST_F(TestExpander, testValidation_invalidGroups_GroupBegin) {
     //A pattern with invalid group
     string pattern = "abc[d";
     bool result = underTest.validate(pattern);
     EXPECT_FALSE(result);
+}
 
+TEST_F(TestExpander, testValidation_invalidGroups_GroupEnd) {
     //A pattern with invalid group
-    pattern = "abc]d";
-    result = underTest.validate(pattern);
-    EXPECT_FALSE(result);
-
-    //A pattern with invalid group
-    pattern = "abc[d[e]z";
-    result = underTest.validate(pattern);
+    string pattern = "abc]d";
+    bool result = underTest.validate(pattern);
     EXPECT_FALSE(result);
 }
 
-TEST_F(TestExpander, testGenerate_StaticBlock)
-{
+TEST_F(TestExpander, testValidation_invalidGroups_UnbalancedGroups) {
+
+    //A pattern with invalid group
+    string pattern = "abc[d[e]z";
+    bool result = underTest.validate(pattern);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(TestExpander, testGenerate_StaticBlock) {
     string pattern = "abcd";
     underTest.generate(pattern);
     auto data = underTest.getData();
     EXPECT_EQ(data.size(), 1);
     EXPECT_EQ(data[0], pattern);
+}
 
-    pattern = "abc/[d";
+TEST_F(TestExpander, testGenerate_StaticBlock_EscGrpBegin) {
+    string pattern = "abc/[d";
     underTest.generate(pattern);
-    data = underTest.getData();
+    auto data = underTest.getData();
     EXPECT_EQ(data.size(), 1);
     EXPECT_EQ(data[0], "abc[d");
+}
 
-    pattern = "abc/]d";
+TEST_F(TestExpander, testGenerate_StaticBlock_EscGrpEnd) {
+    string pattern = "abc/]d";
     underTest.generate(pattern);
-    data = underTest.getData();
+    auto data = underTest.getData();
     EXPECT_EQ(data.size(), 1);
     EXPECT_EQ(data[0], "abc]d");
+}
 
-    pattern = "abc/-d";
+TEST_F(TestExpander, testGenerate_StaticBlock_EscDash) {
+    string pattern = "abc/-d";
     underTest.generate(pattern);
-    data = underTest.getData();
+    auto data = underTest.getData();
     EXPECT_EQ(data.size(), 1);
     EXPECT_EQ(data[0], "abc-d");
+}
 
-    pattern = "abc//d";
+TEST_F(TestExpander, testGenerate_StaticBlock_EscEscChar) {
+
+    string pattern = "abc//d";
     underTest.generate(pattern);
-    data = underTest.getData();
+    auto data = underTest.getData();
     EXPECT_EQ(data.size(), 1);
     EXPECT_EQ(data[0], "abc/d");
 
 }
 
-TEST_F(TestExpander, testGenerate_VariableBlock) {
+TEST_F(TestExpander, testGenerate_VariableBlock_Range) {
     string pattern = "[a-c]";
     underTest.generate(pattern);
     auto data = underTest.getData();
@@ -148,18 +167,21 @@ TEST_F(TestExpander, testGenerate_VariableBlock) {
     EXPECT_EQ(data[0], "a");
     EXPECT_EQ(data[1], "b");
     EXPECT_EQ(data[2], "c");
+}
 
-    pattern = "1[a-c]";
+TEST_F(TestExpander, testGenerate_VariableBlock_Range2) {
+    string pattern = "1[a-c]";
     underTest.generate(pattern);
-    data = underTest.getData();
+    auto data = underTest.getData();
     EXPECT_EQ(data.size(), 3);
     EXPECT_EQ(data[0], "1a");
     EXPECT_EQ(data[1], "1b");
     EXPECT_EQ(data[2], "1c");
-
-    pattern = "[123][a-c]";
+}
+TEST_F(TestExpander, testGenerate_VariableBlock_Range3) {
+    string pattern = "[123][a-c]";
     underTest.generate(pattern);
-    data = underTest.getData();
+    auto data = underTest.getData();
     EXPECT_EQ(data.size(), 9);
     EXPECT_EQ(data[0], "1a");
     EXPECT_EQ(data[1], "2a");
@@ -170,11 +192,12 @@ TEST_F(TestExpander, testGenerate_VariableBlock) {
     EXPECT_EQ(data[6], "1c");
     EXPECT_EQ(data[7], "2c");
     EXPECT_EQ(data[8], "3c");
+}
 
-
-    pattern = "[1-3][a-c]";
+TEST_F(TestExpander, testGenerate_VariableBlock_2Ranges) {
+    string pattern = "[1-3][a-c]";
     underTest.generate(pattern);
-    data = underTest.getData();
+    auto data = underTest.getData();
     EXPECT_EQ(data.size(), 9);
     EXPECT_EQ(data[0], "1a");
     EXPECT_EQ(data[1], "2a");
@@ -185,11 +208,13 @@ TEST_F(TestExpander, testGenerate_VariableBlock) {
     EXPECT_EQ(data[6], "1c");
     EXPECT_EQ(data[7], "2c");
     EXPECT_EQ(data[8], "3c");
+}
 
+TEST_F(TestExpander, testGenerate_VariableBlock_EmbededVarBlock) {
 
-    pattern = "[123[a-c]]";
+    string pattern = "[123[a-c]]";
     underTest.generate(pattern);
-    data = underTest.getData();
+    auto data = underTest.getData();
     EXPECT_EQ(data.size(), 9);
     EXPECT_EQ(data[0], "1a");
     EXPECT_EQ(data[1], "2a");
