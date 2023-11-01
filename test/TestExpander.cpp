@@ -6,6 +6,7 @@
 #include "Expander.h"
 
 using namespace ::testing;
+using namespace std;
 
 class TestExpander  : public ::testing::Test {
 protected:
@@ -51,16 +52,19 @@ TEST_F(TestExpander, testSetters)
 
 
 }
-TEST_F(TestExpander, testValidation)
+TEST_F(TestExpander, testValidation_valid)
 {
     //A simple constant string
     std::string pattern = "abcd";
     bool result = underTest.validate(pattern);
     EXPECT_TRUE(result);
+}
 
+TEST_F(TestExpander, testValidation_validEscSeqs)
+{
     //A pattern with valid escape seq
-    pattern = "abc/-d";
-    result = underTest.validate(pattern);
+    string pattern = "abc/-d";
+    bool result = underTest.validate(pattern);
     EXPECT_TRUE(result);
 
     //A pattern with valid escape seq
@@ -82,27 +86,24 @@ TEST_F(TestExpander, testValidation)
     pattern = "abc\"de\"";
     result = underTest.validate(pattern);
     EXPECT_TRUE(result);
+}
 
-    //A pattern with valid escape seq
-    pattern = "abc[d";
-    result = underTest.validate(pattern);
+TEST_F(TestExpander, testValidation_invalidGroups)
+{
+    //A pattern with invalid group
+    string pattern = "abc[d";
+    bool result = underTest.validate(pattern);
     EXPECT_FALSE(result);
 
-    //A pattern with valid escape seq
+    //A pattern with invalid group
     pattern = "abc]d";
     result = underTest.validate(pattern);
     EXPECT_FALSE(result);
 
-    //A pattern with valid escape seq
+    //A pattern with invalid group
     pattern = "abc[d[e]z";
     result = underTest.validate(pattern);
     EXPECT_FALSE(result);
-
-
-}
-
-TEST_F(TestExpander, testIsEscSeq_Valid)
-{
 }
 
 TEST_F(TestExpander, testStaticBlock)
