@@ -58,6 +58,8 @@ public:
 
     std::vector<std::string> getData();
 
+    std::stringstream output;
+
 private:
 	///used to escape other special symbols
 	char escapeSymbol;
@@ -65,8 +67,6 @@ private:
 
     char groupBegin;
     char groupEnd;
-
-    std::stringstream output;
 
 
 	///the main data storage
