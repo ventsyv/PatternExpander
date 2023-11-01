@@ -106,8 +106,37 @@ TEST_F(TestExpander, testValidation_invalidGroups)
     EXPECT_FALSE(result);
 }
 
-TEST_F(TestExpander, testStaticBlock)
+TEST_F(TestExpander, testGenerate_StaticBlock)
 {
+    string pattern = "abcd";
+    underTest.generate(pattern);
+    auto data = underTest.getData();
+    EXPECT_EQ(data.size(), 1);
+    EXPECT_EQ(data[1], pattern);
+
+    pattern = "abc/[d";
+    underTest.generate(pattern);
+    data = underTest.getData();
+    EXPECT_EQ(data.size(), 1);
+    EXPECT_EQ(data[1], "abc[d");
+
+    pattern = "abc/]d";
+    underTest.generate(pattern);
+    data = underTest.getData();
+    EXPECT_EQ(data.size(), 1);
+    EXPECT_EQ(data[1], "abc]d");
+
+    pattern = "abc/-d";
+    underTest.generate(pattern);
+    data = underTest.getData();
+    EXPECT_EQ(data.size(), 1);
+    EXPECT_EQ(data[1], "abc-d");
+
+    pattern = "abc//d";
+    underTest.generate(pattern);
+    data = underTest.getData();
+    EXPECT_EQ(data.size(), 1);
+    EXPECT_EQ(data[1], "abc/d");
 
 }
 
