@@ -196,7 +196,7 @@ inline bool Expander::isEscSeq(const std::string& pattern, uint position) const
 std::string Expander::expand(const std::string& pattern)
 {
     int size = pattern.length();
-    string result;
+    string result = pattern;
     string expanded;
 
     for (int i = 0; i < size; i++)
@@ -208,12 +208,13 @@ std::string Expander::expand(const std::string& pattern)
         }
         else if (pattern[i] == rangeSymbol) //range symbol reached
         {
+            expanded = "";
             if (i - 1 < 0 || i + 1 >= size)
                 return "";
             else if (!isEscSeq(pattern, i)) //the character was not escaped
             {
-                string preStr = pattern.substr(0, i - 1); //the presiding str
-                string postStr = pattern.substr(i + 2, size - (i + 2)); //the rest of the original str
+                string preStr = result.substr(0, i - 1); //the presiding str
+                string postStr = result.substr(i + 2, size - (i + 2)); //the rest of the original str
 
                 char startRange = pattern[i - 1];
                 char endRange = pattern[i + 1];
