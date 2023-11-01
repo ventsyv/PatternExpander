@@ -22,8 +22,10 @@ test/%.o: test/%.cpp
 	g++ $(FLAGS) $(TEST_FLAGS) $(CXXFLAGS) $< -o $@
 
 
-.PHONY: .default clean build test
-.default: build
+.PHONY: .default clean build test all
+.default: all
+
+all: build test
 
 build: $(OBJECTS) src/main.o
 	g++ $(OBJECTS) src/main.o -o bin/$(EXE_FILE)
