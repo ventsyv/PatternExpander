@@ -10,7 +10,7 @@ Expander::Expander(char esc, char range, char grpBegin, char grpEnd) :
 
 void Expander::generate(const string &pattern)
 {
-
+    data.clear();
     vector<string> results;
 
     //This will expand all range (a-b) expressions
@@ -54,7 +54,7 @@ void Expander::generate(const string &pattern)
         {
             if (currentItem == 0) //data array is empty
             {
-                results.push_back(to_string(expandedPattern[i]));
+                results.push_back(string(1,expandedPattern[i]));
 				currentItem++;
 			} else //variations are present.
 			{
@@ -185,7 +185,10 @@ std::string Expander::expand(const std::string& pattern)
 	uint size = pattern.length();
 	string result;
 
-	uint position = pattern.find(rangeSymbol);
+	int position = pattern.find(rangeSymbol);
+    if (position < 0)
+        result = pattern;
+
 	while ( position >= 0)
 	{
 		if (!isEscSeq(pattern, position)) {
