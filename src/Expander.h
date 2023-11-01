@@ -55,6 +55,8 @@ public:
     char getGroupEnd() const {return groupEnd;}
     void setGroupEnd(char in) {groupEnd = in;}
 
+    std::vector<std::string> getData();
+
 private:
 	///used to escape other special symbols
 	char escapeSymbol;
@@ -71,7 +73,7 @@ private:
 //	std::vector<uint> findAllInstances(const std::string& target, const std::string& item);
 
 	///Looks for any ranges and expands them
-//	std::string expand(const std::string& pattern);
+	std::string expand(const std::string& pattern);
 
 	///Returns true if a valid escape sequence is present at the given position
 	bool isEscSeq(const std::string& pattern, uint position) const;
@@ -85,11 +87,10 @@ private:
 	/***
 	 *
 	 */
-	uint  getBlockElements(const std::string& pattern, uint& start, const std::vector<std::string>& items);
-//
-//    void getCombinations(std::vector<std::string> &data, std::vector<std::string> &newElements);
-//
-//    void processGroup(const std::string &pattern, uint &i, uint &currentItem);
+	uint  getBlockElements(const std::string& pattern, uint& start, std::vector<std::string>& items);
+
+    void getCombinations(std::vector<std::string> &data, std::vector<std::string> &newElements);
+    void processGroup(const std::string &pattern, uint &i, uint &currentItem);
 
     bool getLoadBalance(const std::string& pattern);
 
