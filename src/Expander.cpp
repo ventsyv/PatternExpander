@@ -33,13 +33,12 @@ void Expander::generate(const string &pattern)
     for (uint i = 0; i < pLength; i++) {
         if (expandedPattern[i] == escapeSymbol) //escape character reached
         {
-            if (!isEscSeq(expandedPattern, i)) //check if the next character is a valid escape sequence
+            if (isEscSeq(expandedPattern, i)) //check if the next character is a valid escape sequence
             {
-                return;
-            } else {
                 escSeqReached = true;
+                continue;
             }
-            continue;
+
         } else if (expandedPattern[i] == '[' && !escSeqReached) {
             isFirstInGroup = true;
             load++;
@@ -74,10 +73,14 @@ void Expander::generate(const string &pattern)
 				isFirstInGroup = false;
 			}
 
-//			for (uint item=0; item < temp.size(); item++)
-//			{
-//				results.push_back(partials[item] + expandedPattern[i]);
-//			}
+            if (partials.empty())
+                results.push_back(string(1,expandedPattern[i]));
+            else {
+
+                for (uint item = 0; item < partials.size(); item++) {
+                    results.push_back(partials[item] + expandedPattern[i]);
+                }
+            }
 
 		}
 		escSeqReached = false;
