@@ -11,12 +11,12 @@ typedef unsigned int uint;
 namespace PatternExpander
 {
 
-const char DEFAULT_ESC_SYM = '/';
-const char DEFAULT_RANGE_SYM = '-';
-const char GROUP_SYM_BEGIN = '[';
-const char GROUP_SYM_END = ']';
-const char SINGLE_QUOTE = '\'';
-const char DOUBLE_QUOTE = '"';
+	const char DEFAULT_ESC_SYM = '/';
+	const char DEFAULT_RANGE_SYM = '-';
+	const char GROUP_SYM_BEGIN = '[';
+	const char GROUP_SYM_END = ']';
+	const char SINGLE_QUOTE = '\'';
+	const char DOUBLE_QUOTE = '"';
 
 
 class Expander
@@ -25,13 +25,13 @@ public:
 	
 	///Consructor
 	explicit Expander(char esc = PatternExpander::DEFAULT_ESC_SYM, char range = PatternExpander::DEFAULT_RANGE_SYM,
-             char grpBegin = PatternExpander::GROUP_SYM_BEGIN, char grpEnd = PatternExpander::GROUP_SYM_END);
+			 char grpBegin = PatternExpander::GROUP_SYM_BEGIN, char grpEnd = PatternExpander::GROUP_SYM_END);
 
 	///The main function - it expands the pattern and generates are possible combinations
 	void  generate(const std::string& pattern);
 
-    ///Validate the pattern
-    bool validate(const std::string &pattern);
+	///Validate the pattern
+	bool validate(const std::string &pattern);
 
 	///prints out all generated patterns
 	friend std::ostream& operator<<(std::ostream& os, const Expander& pg)
@@ -43,30 +43,30 @@ public:
 		return os;
 	}
 
-    //Getters and setters
+	//Getters and setters
 	char getEscChar() const {return escapeSymbol;}
 	void setEscChar(char in) {escapeSymbol = in;}
 
 	char getRangeChar() const {return rangeSymbol;}
 	void setRangeChar(char in) {rangeSymbol = in;}
 
-    char getGroupBegin() const {return groupBegin;}
-    void setGroupBegin(char in) {groupBegin = in;}
+	char getGroupBegin() const {return groupBegin;}
+	void setGroupBegin(char in) {groupBegin = in;}
 
-    char getGroupEnd() const {return groupEnd;}
-    void setGroupEnd(char in) {groupEnd = in;}
+	char getGroupEnd() const {return groupEnd;}
+	void setGroupEnd(char in) {groupEnd = in;}
 
-    std::vector<std::string> getData();
+	std::vector<std::string> getData();
 
-    std::stringstream output;
+	std::stringstream output;
 
 private:
 	///used to escape other special symbols
 	char escapeSymbol;
 	char rangeSymbol;
 
-    char groupBegin;
-    char groupEnd;
+	char groupBegin;
+	char groupEnd;
 
 
 	///the main data storage
@@ -92,10 +92,10 @@ private:
 	 */
 	uint  getBlockElements(const std::string& pattern, uint& start, std::vector<std::string>& items);
 
-    void getCombinations(std::vector<std::string> &data, std::vector<std::string> &newElements);
-    void processGroup(const std::string &pattern, uint &i, uint &currentItem);
+	void getCombinations(std::vector<std::string> &data, std::vector<std::string> &newElements);
+	void processGroup(const std::string &pattern, uint &i, uint &currentItem);
 
-    bool getLoadBalance(const std::string& pattern);
+	bool getLoadBalance(const std::string& pattern);
 
 
 };

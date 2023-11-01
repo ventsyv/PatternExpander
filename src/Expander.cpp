@@ -6,54 +6,54 @@ using namespace std;
 using namespace PatternExpander;
 
 Expander::Expander(char esc, char range, char grpBegin, char grpEnd) :
-        escapeSymbol(esc), rangeSymbol(range), groupBegin(grpBegin), groupEnd(grpEnd) {}
+		escapeSymbol(esc), rangeSymbol(range), groupBegin(grpBegin), groupEnd(grpEnd) {}
 
 void Expander::generate(const string &pattern)
 {
-    data.clear();
-    vector<string> results;
+	data.clear();
+	vector<string> results;
 
-    //This will expand all range (a-b) expressions
-    string expandedPattern = expand(pattern);
-    size_t pLength = expandedPattern.length();
-    if (pLength == 0) {
-        return;
-    }
+	//This will expand all range (a-b) expressions
+	string expandedPattern = expand(pattern);
+	size_t pLength = expandedPattern.length();
+	if (pLength == 0) {
+		return;
+	}
 
-    uint currentItem = 0; //current pattern in the data array
-    //Increment when unescaped [ is reached, decrement when ]
-    uint load = 0;
-    bool escSeqReached = false;
+	uint currentItem = 0; //current pattern in the data array
+	//Increment when unescaped [ is reached, decrement when ]
+	uint load = 0;
+	bool escSeqReached = false;
 
-    //When entering a new group, the partial patters are saved off in temp
-    bool isFirstInGroup = true;
-    vector<string> partials;
+	//When entering a new group, the partial patters are saved off in temp
+	bool isFirstInGroup = true;
+	vector<string> partials;
 
 
-    for (uint i = 0; i < pLength; i++) {
-        if (expandedPattern[i] == escapeSymbol) //escape character reached
-        {
-            if (isEscSeq(expandedPattern, i)) //check if the next character is a valid escape sequence
-            {
-                escSeqReached = true;
-                continue;
-            }
+	for (uint i = 0; i < pLength; i++) {
+		if (expandedPattern[i] == escapeSymbol) //escape character reached
+		{
+			if (isEscSeq(expandedPattern, i)) //check if the next character is a valid escape sequence
+			{
+				escSeqReached = true;
+				continue;
+			}
 
-        } else if (expandedPattern[i] == groupBegin && !escSeqReached) {
-            isFirstInGroup = true;
-            load++;
-            continue;
-        } else if (expandedPattern[i] == groupEnd && !escSeqReached) {
-            load--;
-            continue;
-        }
+		} else if (expandedPattern[i] == groupBegin && !escSeqReached) {
+			isFirstInGroup = true;
+			load++;
+			continue;
+		} else if (expandedPattern[i] == groupEnd && !escSeqReached) {
+			load--;
+			continue;
+		}
 
-        //it is a part of the pattern
-        if (load == 0) //constant character - escape sequences here are disregarded
-        {
-            if (currentItem == 0) //data array is empty
-            {
-                results.push_back(string(1,expandedPattern[i]));
+		//it is a part of the pattern
+		if (load == 0) //constant character - escape sequences here are disregarded
+		{
+			if (currentItem == 0) //data array is empty
+			{
+				results.push_back(string(1,expandedPattern[i]));
 				currentItem++;
 			} else //variations are present.
 			{
@@ -67,30 +67,30 @@ void Expander::generate(const string &pattern)
 		} else if (load > 0) //character inside a variable block
 		{
 			//when we first enter the variable block, we save the
-            //existing patterns
+			//existing patterns
 			if (isFirstInGroup)
 			{
 				partials = results;
-                //The variable block is not optional, so we need to clear the result set
-                //For example: 1[a-c] is expected to produce 1a, 1b, 1c
-                //Without the clear, it produces 1, 1a, 1b, 1c
-                results.clear();
+				//The variable block is not optional, so we need to clear the result set
+				//For example: 1[a-c] is expected to produce 1a, 1b, 1c
+				//Without the clear, it produces 1, 1a, 1b, 1c
+				results.clear();
 				isFirstInGroup = false;
 			}
 
-            //It's possible the variable block appears first in the pattern
-            //That means that the result set is empty
-            //If that's the case, just add the first item from the varible block
-            if (partials.empty())
-                results.push_back(string(1,expandedPattern[i]));
-            else {
-                //The result set is not empty
-                //Append the first item of the variable block to the existing patterns,
-                //then add it the result set.
-                for (uint item = 0; item < partials.size(); item++) {
-                    results.push_back(partials[item] + expandedPattern[i]);
-                }
-            }
+			//It's possible the variable block appears first in the pattern
+			//That means that the result set is empty
+			//If that's the case, just add the first item from the varible block
+			if (partials.empty())
+				results.push_back(string(1,expandedPattern[i]));
+			else {
+				//The result set is not empty
+				//Append the first item of the variable block to the existing patterns,
+				//then add it the result set.
+				for (uint item = 0; item < partials.size(); item++) {
+					results.push_back(partials[item] + expandedPattern[i]);
+				}
+			}
 
 		}
 		escSeqReached = false;
@@ -159,7 +159,7 @@ uint Expander::getBlockElements(const string& pattern, uint& start,
 		}
 		else if (!isEscSeq(pattern, currentIndx)) //just normal characters
 		{
-            //TODO: Check if we really need to have an exclude symbol
+			//TODO: Check if we really need to have an exclude symbol
 //			if (pattern[currentIndx] != excludeSymbol)
 				items[i] = pattern[currentIndx];
 //			else
@@ -183,10 +183,10 @@ inline bool Expander::isEscSeq(const std::string& pattern, uint position) const
 	if (position + 1 <= pattern.length() && pattern[position] == escapeSymbol) //first char. in sequence is indeed escape char.
 	{
 		//check second char in sequence
-        char second = pattern[position + 1];
+		char second = pattern[position + 1];
 		if (second == escapeSymbol || second == rangeSymbol || second == groupBegin || second == groupEnd) {
-            result = true;
-        } else {
+			result = true;
+		} else {
 				result = false;
 		}
 	}
@@ -195,107 +195,106 @@ inline bool Expander::isEscSeq(const std::string& pattern, uint position) const
 
 std::string Expander::expand(const std::string& pattern)
 {
-    int size = pattern.length();
-    string result = pattern;
-    string expanded;
+	int size = pattern.length();
+	string result = pattern;
+	string expanded;
 
-    for (int i = 0; i < size; i++)
-    {
-        if (isEscSeq(pattern, i))
-        {
-            i++;
-            continue;
-        }
-        else if (pattern[i] == rangeSymbol) //range symbol reached
-        {
-            expanded = "";
-            if (i - 1 < 0 || i + 1 >= size)
-                return "";
-            else if (!isEscSeq(pattern, i)) //the character was not escaped
-            {
-                string preStr = result.substr(0, i - 1); //the presiding str
-                string postStr = result.substr(i + 2, size - (i + 2)); //the rest of the original str
+	for (int i = 0; i < size; i++)
+	{
+		if (isEscSeq(pattern, i))
+		{
+			i++;
+			continue;
+		}
+		else if (pattern[i] == rangeSymbol) //range symbol reached
+		{
+			expanded = "";
+			if (i - 1 < 0 || i + 1 >= size)
+				return "";
+			else if (!isEscSeq(pattern, i)) //the character was not escaped
+			{
+				string preStr = result.substr(0, i - 1); //the presiding str
+				string postStr = result.substr(i + 2, size - (i + 2)); //the rest of the original str
 
-                char startRange = pattern[i - 1];
-                char endRange = pattern[i + 1];
+				char startRange = pattern[i - 1];
+				char endRange = pattern[i + 1];
 
-                //if both are alphabetical characters
-                if ((isalpha(startRange) && isalpha(endRange))
-                    || (isdigit(startRange) && isdigit(endRange)))
-                {
-                    if ((int) startRange < (int) endRange) //inorder
-                    {
-                        for (int j = startRange; j <= endRange; j++)
-                        {
-                            expanded += (char) j;
-                        }
-                    }
-                    else //reverse order
-                    {
-                        for (int j = startRange; j >= endRange; j--)
-                        {
-                            expanded += (char) j;
-                        }
-                    }
-                }
-                else
-                    return ""; //range does not seem valid
-                result = preStr + expanded + postStr;
-                size = pattern.length();
-                i += 2;
-            }
-        }
-        //result = "";
-    } //end for
+				//if both are alphabetical characters
+				if ((isalpha(startRange) && isalpha(endRange))
+					|| (isdigit(startRange) && isdigit(endRange)))
+				{
+					if ((int) startRange < (int) endRange) //inorder
+					{
+						for (int j = startRange; j <= endRange; j++)
+						{
+							expanded += (char) j;
+						}
+					}
+					else //reverse order
+					{
+						for (int j = startRange; j >= endRange; j--)
+						{
+							expanded += (char) j;
+						}
+					}
+				}
+				else
+					return ""; //range does not seem valid
+				result = preStr + expanded + postStr;
+				size = pattern.length();
+				i += 2;
+			}
+		}
+		//result = "";
+	} //end for
 
-    if (result == "")
-        result = pattern;
-    return result;
+	if (result == "")
+		result = pattern;
+	return result;
 }
 
 
 
 bool Expander::validate(const string& pattern)
 {
-    int loadBrackets = 0;
-    uint loadQuotes = 0;
+	int loadBrackets = 0;
+	uint loadQuotes = 0;
 
 	for (uint i = 0; i < pattern.size(); i++)
 	{
 		if (pattern[i] == escapeSymbol) {
-            if (!isEscSeq(pattern, i)) {
-                output << "Error: Invalid escape sequence detected" << endl;
-                output << pattern << endl;
-                output << std::setw(i) << "^" << endl;
-                return false;
-            }
-            else
-            {
-                i++;
-            }
+			if (!isEscSeq(pattern, i)) {
+				output << "Error: Invalid escape sequence detected" << endl;
+				output << pattern << endl;
+				output << std::setw(i) << "^" << endl;
+				return false;
+			}
+			else
+			{
+				i++;
+			}
 		}
-        else
-        {
-            if (pattern[i] == groupBegin)
-                loadBrackets++;
-            else if (pattern[i] == groupEnd)
-                loadBrackets--;
-            else if (pattern[i] == DOUBLE_QUOTE)
-                loadQuotes++;
+		else
+		{
+			if (pattern[i] == groupBegin)
+				loadBrackets++;
+			else if (pattern[i] == groupEnd)
+				loadBrackets--;
+			else if (pattern[i] == DOUBLE_QUOTE)
+				loadQuotes++;
 
-            if (loadBrackets < 0)
-            {
-                output << "Error: Invalid group sequence detected" << endl;
-                output << pattern << endl;
-                output << std::setw(i) << "^" << endl;
-                return false;
-            }
+			if (loadBrackets < 0)
+			{
+				output << "Error: Invalid group sequence detected" << endl;
+				output << pattern << endl;
+				output << std::setw(i) << "^" << endl;
+				return false;
+			}
 
-        }
-			
+		}
 	}
 
-    return ((loadQuotes % 2 == 0) && (loadBrackets % 2 == 0));
+	return ((loadQuotes % 2 == 0) && (loadBrackets % 2 == 0));
 }
 
 void Expander::getCombinations(vector<string>& data, vector<string>& newElements)
@@ -341,7 +340,7 @@ void Expander::processGroup(const string& pattern, uint& i,
 		uint& currentItem)
 {
 	//string* newItems = NULL;
-    vector<string> newItems;
+	vector<string> newItems;
 	int eCount = getBlockElements(pattern, i, newItems);
 	if (currentItem == 0) //data is empty
 	{
@@ -383,5 +382,5 @@ void Expander::processGroup(const string& pattern, uint& i,
 }
 
 std::vector<std::string> Expander::getData() {
-    return data;
+	return data;
 }
