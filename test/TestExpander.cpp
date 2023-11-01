@@ -11,6 +11,15 @@ using namespace std;
 class TestExpander  : public ::testing::Test {
 protected:
     PatternExpander::Expander underTest;
+    PatternExpander::Expander altExpander;
+
+
+    virtual void SetUp() {
+        altExpander.setEscChar('#');
+        altExpander.setGroupBegin('{');
+        altExpander.setGroupEnd('}');
+        altExpander.setRangeChar('>');
+    }
 };
 
 TEST_F(TestExpander, testGetters)
@@ -215,6 +224,181 @@ TEST_F(TestExpander, testGenerate_VariableBlock_EmbededVarBlock) {
     string pattern = "[123[a-c]]";
     underTest.generate(pattern);
     auto data = underTest.getData();
+    EXPECT_EQ(data.size(), 9);
+    EXPECT_EQ(data[0], "1a");
+    EXPECT_EQ(data[1], "2a");
+    EXPECT_EQ(data[2], "3a");
+    EXPECT_EQ(data[3], "1b");
+    EXPECT_EQ(data[4], "2b");
+    EXPECT_EQ(data[5], "3b");
+    EXPECT_EQ(data[6], "1c");
+    EXPECT_EQ(data[7], "2c");
+    EXPECT_EQ(data[8], "3c");
+}
+
+TEST_F(TestExpander, testValidation_valid_alt)
+{
+    //A simple constant string
+    std::string pattern = "abcd";
+    bool result = altExpander.validate(pattern);
+    EXPECT_TRUE(result);
+}
+
+TEST_F(TestExpander, testValidation_validEscSeqs_Dash_alt) {
+    //A pattern with valid escape seq
+    string pattern = "abc#>d";
+    bool result = altExpander.validate(pattern);
+    EXPECT_TRUE(result);
+}
+
+TEST_F(TestExpander, testValidation_validEscSeqs_GroupBegin_alt) {
+    //A pattern with valid escape seq
+    string pattern = "abc#{d";
+    bool result = altExpander.validate(pattern);
+    EXPECT_TRUE(result);
+}
+
+TEST_F(TestExpander, testValidation_validEscSeqs_GroupEnd_alt) {
+    //A pattern with valid escape seq
+    string pattern = "abc#}d";
+    bool result = altExpander.validate(pattern);
+    EXPECT_TRUE(result);
+}
+
+TEST_F(TestExpander, testValidation_validEscSeqs_EscChar_alt) {
+    //A pattern with valid escape seq
+    string pattern = "abc##d";
+    bool result = altExpander.validate(pattern);
+    EXPECT_TRUE(result);
+}
+
+TEST_F(TestExpander, testValidation_validEscSeqs_Quotes_alt) {
+    //A pattern with valid escape seq
+    string pattern = "abc\"de\"";
+    bool result = altExpander.validate(pattern);
+    EXPECT_TRUE(result);
+}
+
+TEST_F(TestExpander, testValidation_invalidGroups_GroupBegin_alt) {
+    //A pattern with invalid group
+    string pattern = "abc{d";
+    bool result = altExpander.validate(pattern);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(TestExpander, testValidation_invalidGroups_GroupEnd_alt) {
+    //A pattern with invalid group
+    string pattern = "abc}d";
+    bool result = altExpander.validate(pattern);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(TestExpander, testValidation_invalidGroups_UnbalancedGroups_alt) {
+
+    //A pattern with invalid group
+    string pattern = "abc{d{e}z";
+    bool result = altExpander.validate(pattern);
+    EXPECT_FALSE(result);
+}
+
+TEST_F(TestExpander, testGenerate_StaticBlock_alt) {
+    string pattern = "abcd";
+    altExpander.generate(pattern);
+    auto data = altExpander.getData();
+    EXPECT_EQ(data.size(), 1);
+    EXPECT_EQ(data[0], pattern);
+}
+
+TEST_F(TestExpander, testGenerate_StaticBlock_EscGrpBegin_alt) {
+    string pattern = "abc#{d";
+    altExpander.generate(pattern);
+    auto data = altExpander.getData();
+    EXPECT_EQ(data.size(), 1);
+    EXPECT_EQ(data[0], "abc{d");
+}
+
+TEST_F(TestExpander, testGenerate_StaticBlock_EscGrpEnd_alt) {
+    string pattern = "abc#}d";
+    altExpander.generate(pattern);
+    auto data = altExpander.getData();
+    EXPECT_EQ(data.size(), 1);
+    EXPECT_EQ(data[0], "abc}d");
+}
+
+TEST_F(TestExpander, testGenerate_StaticBlock_EscDash_alt) {
+    string pattern = "abc#>d";
+    altExpander.generate(pattern);
+    auto data = altExpander.getData();
+    EXPECT_EQ(data.size(), 1);
+    EXPECT_EQ(data[0], "abc>d");
+}
+
+TEST_F(TestExpander, testGenerate_StaticBlock_EscEscChar_alt) {
+
+    string pattern = "abc##d";
+    altExpander.generate(pattern);
+    auto data = altExpander.getData();
+    EXPECT_EQ(data.size(), 1);
+    EXPECT_EQ(data[0], "abc#d");
+
+}
+
+TEST_F(TestExpander, testGenerate_VariableBlock_Range_alt) {
+    string pattern = "{a>c}";
+    altExpander.generate(pattern);
+    auto data = altExpander.getData();
+    EXPECT_EQ(data.size(), 3);
+    EXPECT_EQ(data[0], "a");
+    EXPECT_EQ(data[1], "b");
+    EXPECT_EQ(data[2], "c");
+}
+
+TEST_F(TestExpander, testGenerate_VariableBlock_Range2_alt) {
+    string pattern = "1{a>c}";
+    altExpander.generate(pattern);
+    auto data = altExpander.getData();
+    EXPECT_EQ(data.size(), 3);
+    EXPECT_EQ(data[0], "1a");
+    EXPECT_EQ(data[1], "1b");
+    EXPECT_EQ(data[2], "1c");
+}
+TEST_F(TestExpander, testGenerate_VariableBlock_Range3_alt) {
+    string pattern = "{123}{a>c}";
+    altExpander.generate(pattern);
+    auto data = altExpander.getData();
+    EXPECT_EQ(data.size(), 9);
+    EXPECT_EQ(data[0], "1a");
+    EXPECT_EQ(data[1], "2a");
+    EXPECT_EQ(data[2], "3a");
+    EXPECT_EQ(data[3], "1b");
+    EXPECT_EQ(data[4], "2b");
+    EXPECT_EQ(data[5], "3b");
+    EXPECT_EQ(data[6], "1c");
+    EXPECT_EQ(data[7], "2c");
+    EXPECT_EQ(data[8], "3c");
+}
+
+TEST_F(TestExpander, testGenerate_VariableBlock_2Ranges_alt) {
+    string pattern = "{1>3}{a>c}";
+    altExpander.generate(pattern);
+    auto data = altExpander.getData();
+    EXPECT_EQ(data.size(), 9);
+    EXPECT_EQ(data[0], "1a");
+    EXPECT_EQ(data[1], "2a");
+    EXPECT_EQ(data[2], "3a");
+    EXPECT_EQ(data[3], "1b");
+    EXPECT_EQ(data[4], "2b");
+    EXPECT_EQ(data[5], "3b");
+    EXPECT_EQ(data[6], "1c");
+    EXPECT_EQ(data[7], "2c");
+    EXPECT_EQ(data[8], "3c");
+}
+
+TEST_F(TestExpander, testGenerate_VariableBlock_EmbededVarBlock_alt) {
+
+    string pattern = "{123{a>c}}";
+    altExpander.generate(pattern);
+    auto data = altExpander.getData();
     EXPECT_EQ(data.size(), 9);
     EXPECT_EQ(data[0], "1a");
     EXPECT_EQ(data[1], "2a");
