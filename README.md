@@ -12,13 +12,13 @@ Characters between [ ] are a group. Every character in a group is substituted
 at the given position.
 
 
-##Syntax
+## Syntax
 
-###Static strings
+### Static strings
 Any unadorned strings are considered static. For example given the pattern
 `abc[123]` - abc is static part. That part of the pattern doesn't change.
 
-###Groups:
+### Groups:
 A group is a group of characters that are possible
 - [abc] - Substitubes one each of the listed symbols 
 - [a - z] - Range. Expands to be equivalend to [a...z]
