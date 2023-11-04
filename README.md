@@ -27,7 +27,7 @@ A group is a group of characters that are possible
 All characters are case sensative.
 
 
-##Examples:
+## Examples:
 ### Static examples
 	Pattern: "abcd"
 	Result: "abcd"
@@ -64,16 +64,16 @@ All characters are case sensative.
 
 ## Building
 
-###Targets:
+### Targets:
 - release: default target. Builds the main executable
 - test: Builds the main executable with debug info. Builds and runs the unit tests.
 - report - creates a coverage report
 
 
-###Install build requirements:
+### Install build requirements:
 `sudo apt-get install build-essential libgtest-dev gcovr`
 
-###Compile:
+### Compile:
 `make`
 
 ###Run unit tests
