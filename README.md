@@ -76,7 +76,7 @@ All characters are case sensative.
 ### Compile:
 `make`
 
-###Run unit tests
+### Run unit tests
 `make test`
 
 
