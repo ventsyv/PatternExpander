@@ -9,8 +9,7 @@ Expander::Expander(wchar_t esc, wchar_t range, wchar_t grpBegin, wchar_t grpEnd)
 		escapeSymbol(esc), rangeSymbol(range), groupBegin(grpBegin), groupEnd(grpEnd) {}
 
 void Expander::generate(const wstring &pattern)
-{
-	data.clear();
+{	
 	vector<wstring> results;
 
 	//This will expand all range (a-b) expressions
