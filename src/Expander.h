@@ -11,12 +11,12 @@ typedef unsigned int uint;
 namespace PatternExpander
 {
 
-	const char DEFAULT_ESC_SYM = '/';
-	const char DEFAULT_RANGE_SYM = '-';
-	const char GROUP_SYM_BEGIN = '[';
-	const char GROUP_SYM_END = ']';
-	const char SINGLE_QUOTE = '\'';
-	const char DOUBLE_QUOTE = '"';
+	const wchar_t DEFAULT_ESC_SYM = '/';
+	const wchar_t DEFAULT_RANGE_SYM = '-';
+	const wchar_t GROUP_SYM_BEGIN = '[';
+	const wchar_t GROUP_SYM_END = ']';
+	const wchar_t SINGLE_QUOTE = '\'';
+	const wchar_t DOUBLE_QUOTE = '"';
 
 
 class Expander
@@ -24,17 +24,17 @@ class Expander
 public:
 	
 	///Consructor
-	explicit Expander(char esc = PatternExpander::DEFAULT_ESC_SYM, char range = PatternExpander::DEFAULT_RANGE_SYM,
-			 char grpBegin = PatternExpander::GROUP_SYM_BEGIN, char grpEnd = PatternExpander::GROUP_SYM_END);
+	explicit Expander(wchar_t esc = PatternExpander::DEFAULT_ESC_SYM, wchar_t range = PatternExpander::DEFAULT_RANGE_SYM,
+			 wchar_t grpBegin = PatternExpander::GROUP_SYM_BEGIN, wchar_t grpEnd = PatternExpander::GROUP_SYM_END);
 
 	///The main function - it expands the pattern and generates are possible combinations
-	void  generate(const std::string& pattern);
+	void  generate(const std::wstring& pattern);
 
 	///Validate the pattern
-	bool validate(const std::string &pattern);
+	bool validate(const std::wstring &pattern);
 
 	///prints out all generated patterns
-	friend std::ostream& operator<<(std::ostream& os, const Expander& pg)
+	friend std::wostream& operator<<(std::wostream& os, const Expander& pg)
 	{
 		for (size_t i = 0; i < pg.data.size(); i++)
 		{
@@ -44,58 +44,58 @@ public:
 	}
 
 	//Getters and setters
-	char getEscChar() const {return escapeSymbol;}
-	void setEscChar(char in) {escapeSymbol = in;}
+	wchar_t getEscChar() const {return escapeSymbol;}
+	void setEscChar(wchar_t in) {escapeSymbol = in;}
 
-	char getRangeChar() const {return rangeSymbol;}
-	void setRangeChar(char in) {rangeSymbol = in;}
+	wchar_t getRangeChar() const {return rangeSymbol;}
+	void setRangeChar(wchar_t in) {rangeSymbol = in;}
 
-	char getGroupBegin() const {return groupBegin;}
-	void setGroupBegin(char in) {groupBegin = in;}
+	wchar_t getGroupBegin() const {return groupBegin;}
+	void setGroupBegin(wchar_t in) {groupBegin = in;}
 
-	char getGroupEnd() const {return groupEnd;}
-	void setGroupEnd(char in) {groupEnd = in;}
+	wchar_t getGroupEnd() const {return groupEnd;}
+	void setGroupEnd(wchar_t in) {groupEnd = in;}
 
-	std::vector<std::string> getData();
+	std::vector<std::wstring> getData();
 
-	std::stringstream output;
+	std::wstringstream output;
 
 private:
 	///used to escape other special symbols
-	char escapeSymbol;
-	char rangeSymbol;
+	wchar_t escapeSymbol;
+	wchar_t rangeSymbol;
 
-	char groupBegin;
-	char groupEnd;
+	wchar_t groupBegin;
+	wchar_t groupEnd;
 
 
 	///the main data storage
-	std::vector<std::string> data;
+	std::vector<std::wstring> data;
 	
 	///Used to find all opening / closing brackets
-//	std::vector<uint> findAllInstances(const std::string& target, const std::string& item);
+//	std::vector<uint> findAllInstances(const std::wstring& target, const std::wstring& item);
 
 	///Looks for any ranges and expands them
-	std::string expand(const std::string& pattern);
+	std::wstring expand(const std::wstring& pattern);
 
 	///Returns true if a valid escape sequence is present at the given position
-	bool isEscSeq(const std::string& pattern, uint position) const;
+	bool isEscSeq(const std::wstring& pattern, uint position) const;
 	
 	/**A character set is a group of characters surrounded by []
 	 * Characters can be listed individually - [abc]
 	 * or as a range [a-c]. Special characters lose their meaning inside a set
 	 */
-	std::vector<std::string> handleCharacterSet(const std::string& pattern, uint);
+	std::vector<std::wstring> handleCharacterSet(const std::wstring& pattern, uint);
 
 	/***
 	 *
 	 */
-	uint  getBlockElements(const std::string& pattern, uint& start, std::vector<std::string>& items);
+	uint  getBlockElements(const std::wstring& pattern, uint& start, std::vector<std::wstring>& items);
 
-	void getCombinations(std::vector<std::string> &data, std::vector<std::string> &newElements);
-	void processGroup(const std::string &pattern, uint &i, uint &currentItem);
+	void getCombinations(std::vector<std::wstring> &data, std::vector<std::wstring> &newElements);
+	void processGroup(const std::wstring &pattern, uint &i, uint &currentItem);
 
-	bool getLoadBalance(const std::string& pattern);
+	bool getLoadBalance(const std::wstring& pattern);
 
 
 };
