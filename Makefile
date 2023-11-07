@@ -48,20 +48,20 @@ clean:
 	@find . -name "*.gcov" -delete
 	
 
-debug: CXXFLAGS += -DDEBUG -g -O0
+debug: CXXFLAGS += -DDEBUG -g -O0 -fPIC -fprofile-arcs -ftest-coverage -Lgcov
 debug: $(DEBUG_OBJS) $(DEBUG_MAIN_OBJ)
 	-@mkdir bin
 	g++ $(DEBUG_OBJS) $(DEBUG_MAIN_OBJ) -o bin/$(EXE_FILE)d
 
 
-test: CXXFLAGS += -DDEBUG -g
+test: CXXFLAGS += -DDEBUG -g -fPIC -fprofile-arcs -ftest-coverage 
 test: $(DEBUG_OBJS) $(TEST_OBJS)
 	-mkdir bin
-	g++ $(DEBUG_OBJS) $(TEST_OBJS) -lgtest -Lgoogletest/build/lib -o bin/unittests
+	g++ $(DEBUG_OBJS) $(TEST_OBJS) -lgtest -Lgoogletest/build/lib -Lgcov -fPIC -fprofile-arcs -ftest-coverage  -o bin/unittests
 	bin/unittests
 	
-coverage: ## Run code coverage
-	@gcov src/Expander.cpp src/main.cpp test/TestExpander.cpp
+coverage: test ## Run code coverage
+	@gcov src/Expander.cpp src/main.cpp test/TestExpander.cpp -o $(DEBUG_DIR) 
 	
 report: coverage ## Generate gcovr report
 	@mkdir gcovr-report 2> /dev/null || true
