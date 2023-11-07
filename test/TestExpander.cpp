@@ -2,7 +2,7 @@
 // Unit tests for the Expander class
 //
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include "Expander.h"
 
 using namespace ::testing;
