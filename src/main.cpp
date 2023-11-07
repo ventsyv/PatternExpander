@@ -10,6 +10,8 @@ int main(int argc, char *argv[])
 {
 	wstring pattern;
     PatternExpander::Expander exp;
+    
+    std::setlocale(LC_CTYPE, "C.UTF8"); 
 
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
 	if (argc > 1)

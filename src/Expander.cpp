@@ -218,7 +218,7 @@ std::wstring Expander::expand(const std::wstring& pattern)
 				wchar_t startRange = pattern[i - 1];
 				wchar_t endRange = pattern[i + 1];
 				
-				std::locale loc2("en_US.UTF8");
+				std::locale loc2("C.UTF8");
 
 				//if both are alphabetical chars
 				if ((isalpha(startRange, loc2) && isalpha(endRange, loc2))
