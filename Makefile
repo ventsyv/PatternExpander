@@ -61,7 +61,7 @@ test: $(DEBUG_OBJS) $(TEST_OBJS)
 	bin/unittests
 	
 coverage: test ## Run code coverage
-	@gcov src/Expander.cpp src/main.cpp test/TestExpander.cpp -o $(DEBUG_DIR) 
+	@gcov -r src/Expander.cpp src/main.cpp test/TestExpander.cpp -o $(DEBUG_DIR) 
 	
 report: coverage ## Generate gcovr report
 	@mkdir gcovr-report 2> /dev/null || true
