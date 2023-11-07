@@ -1,17 +1,21 @@
 EXE_FILE:=patexp
-OBJECTS:= Expander.o main.o
+SRC_FILES:= Expander.o
+MAIN_FILE:= main.o
+TEST_FILES:= TestExpander.o
 
 DEBUG_DIR = build/debug
 RELEASE_DIR = build/release
+TEST_DIR = build/test
 
-DEBUG_OBJS = $(addprefix $(DEBUG_DIR)/, $(OBJECTS))
-RELEASE_OBJS = $(addprefix $(RELEASE_DIR)/, $(OBJECTS))
+DEBUG_OBJS = $(addprefix $(DEBUG_DIR)/, $(SRC_FILES))
+DEBUG_MAIN_OBJ = $(addprefix $(DEBUG_DIR)/, $(MAIN_FILE))
+RELEASE_OBJS = $(addprefix $(RELEASE_DIR)/, $(SRC_FILES) $(MAIN_FILE) )
+TEST_OBJS = $(addprefix $(TEST_DIR)/, $(TEST_FILES))
 
-TEST_FLAGS:= $(CXXFLAGS) -fPIC -fprofile-arcs -ftest-coverage -Lgcov
+#TEST_FLAGS:= $(CXXFLAGS) -fPIC -fprofile-arcs -ftest-coverage -Lgcov
 
-CXXFLAGS +=  -c -I./src -I/usr/include -Wall -Wextra -pthread
+CXXFLAGS +=  -c -Wall -Wextra -Isrc/
 
-TEST_OBJS:= test/TestExpander.o
 
 .PHONY: .default clean build test all coverage report install debug
 .default: build
@@ -24,8 +28,9 @@ $(DEBUG_DIR)/%.o: src/%.cpp
 	@mkdir -p $(@D)
 	g++ $(CXXFLAGS) -o $@ $<
 
-test/%.o: test/%.cpp
-	g++ $(FLAGS) $(TEST_FLAGS) $(CXXFLAGS) $< -o $@
+$(TEST_DIR)/%.o: test/%.cpp
+	@mkdir -p $(@D)
+	g++ $(CXXFLAGS) -o $@ $<
 
 # Builds the release executable
 build: CXXFLAGS += -O3
@@ -44,15 +49,15 @@ clean:
 	
 
 debug: CXXFLAGS += -DDEBUG -g -O0
-debug: $(DEBUG_OBJS) src/main.o
+debug: $(DEBUG_OBJS) $(DEBUG_MAIN_OBJ)
 	-@mkdir bin
-	g++ $(DEBUG_OBJS) -o bin/$(EXE_FILE)d
+	g++ $(DEBUG_OBJS) $(DEBUG_MAIN_OBJ) -o bin/$(EXE_FILE)d
 
 
-test: CXXFLAGS += -DDEBUG -g -fprofile-arcs -ftest-coverage
-test: $(OBJECTS) $(TEST_OBJS)
+test: CXXFLAGS += -DDEBUG -g
+test: $(DEBUG_OBJS) $(TEST_OBJS)
 	-mkdir bin
-	g++ $(TEST_FLAGS) $(OBJECTS) $(TEST_OBJS) -lgtest -Lgoogletest/build/lib -o bin/unittests
+	g++ $(DEBUG_OBJS) $(TEST_OBJS) -lgtest -Lgoogletest/build/lib -o bin/unittests
 	bin/unittests
 	
 coverage: ## Run code coverage
