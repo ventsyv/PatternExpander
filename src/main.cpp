@@ -7,20 +7,56 @@
 
 using namespace std;
 
-int main(int argc, char *argv[])
+void run_command(int argc, char *argv[])
 {
 	wstring pattern;
     PatternExpander::Expander exp;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
+    
+    string command(argv[1]);
+	std::transform(command.begin(), command.end(), command.begin(), ::tolower);
+    
+	if (argc > 2)
+	{
+		for (int currentParam = 2; currentParam < argc; currentParam++)
+		{
+			pattern = wcu8.from_bytes(argv[currentParam]);
+			if (command == "validate")
+				exp.validate(pattern);
+			else if (command == "run")
+				exp.generate(pattern);
+				
+			wcout << exp;
+				
+		}
+	}
+	else
+	{
+		string temp;
+		while (cin >> temp)
+		{
+			pattern = wcu8.from_bytes(temp);
+			if (command == "validate")
+				exp.validate(pattern);
+			else if (command == "run")
+				exp.generate(pattern);
+		}
+		
+		wcout << exp;
+	}
+}
+
+int main(int argc, char *argv[])
+{
     
     std::setlocale(LC_CTYPE, "C.UTF8"); 
     
     wstring usage = LR"(usage: patexp [-h | --help] <command> [<args>]
 	commands:
 		run: Generates strings from a list of patterns
-		verify: Verify if the patterns provided are syntaxically correct
+		validate: Validates if the patterns provided are syntaxically correct
 		configure: Sets the various configuration options)";
 
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
 	if (argc > 1)
 	{
 		string command(argv[1]);
@@ -30,48 +66,15 @@ int main(int argc, char *argv[])
 			wcout << usage << endl;
 			exit(0);
 		}
-		else if (command == "run")
+		else if (command == "run" || command == "validate")
 		{
-			if (argc > 2)
-			{
-				for (int currentParam = 2; currentParam < argc; currentParam++)
-				{
-					pattern = wcu8.from_bytes(argv[currentParam]);
-					exp.generate(pattern);
-				}
-			}
-			else
-			{
-				string temp;
-				while (cin >> temp)
-				{
-					pattern = wcu8.from_bytes(temp);
-					exp.generate(pattern);
-				}
-			}
-	
-			//Output the results
-			wcout<<exp;
+			run_command(argc, argv);
+			
 		}
-		else if (command == "verify") 
+		else if ( command == "config" || command == "configure")
 		{
-			if (argc > 2)
-			{
-				for (int currentParam = 2; currentParam < argc; currentParam++)
-				{
-					pattern = wcu8.from_bytes(argv[currentParam]);
-					exp.validate(pattern);
-				}
-			}
-			else
-			{
-				string temp;
-				while (cin >> temp)
-				{
-					pattern = wcu8.from_bytes(temp);
-					exp.validate(pattern);
-				}
-			}
+			wcout << "Configure is currently not implemented"<<endl;
+			exit(1);
 		}
 		else
 		{
