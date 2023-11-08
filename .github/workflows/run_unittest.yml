@@ -1,0 +1,17 @@
+---
+name: run-unittest
+run-name: Run the unit tests
+on: 
+    pull_request:
+        branches:
+            - main
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build essentials
+        run: sudo apt-get install build-essential libgtest-dev gcovr
+      - name: Run tests
+        run: make test
