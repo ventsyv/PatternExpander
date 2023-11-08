@@ -22,11 +22,15 @@ void run_command(int argc, char *argv[])
 		{
 			pattern = wcu8.from_bytes(argv[currentParam]);
 			if (command == "validate")
+			{
 				exp.validate(pattern);
+				wcerr 	 << exp.output.str();
+			}
 			else if (command == "run")
-				exp.generate(pattern);
-				
-			wcout << exp;
+			{
+				exp.generate(pattern);		
+				wcout << exp;
+			}
 				
 		}
 	}
@@ -35,11 +39,17 @@ void run_command(int argc, char *argv[])
 		string temp;
 		while (cin >> temp)
 		{
-			pattern = wcu8.from_bytes(temp);
+			pattern = wcu8.from_bytes(temp);			
 			if (command == "validate")
+			{
 				exp.validate(pattern);
+				wcerr << exp.output.str();
+			}
 			else if (command == "run")
-				exp.generate(pattern);
+			{
+				exp.generate(pattern);		
+				wcout << exp;
+			}
 		}
 		
 		wcout << exp;
