@@ -16,8 +16,8 @@ TEST_OBJS = $(addprefix $(TEST_DIR)/, $(TEST_FILES))
 CXXFLAGS +=  -c -Wall -Wextra -Isrc/
 
 
-.PHONY: .default clean build test all coverage report install debug
-.default: build
+.PHONY: .default clean release install debug test coverage report 
+.default: release
     
 $(RELEASE_DIR)/%.o: src/%.cpp
 	 @mkdir -p $(@D)
@@ -32,8 +32,8 @@ $(TEST_DIR)/%.o: test/%.cpp
 	g++ $(CXXFLAGS) -o $@ $<
 
 # Builds the release executable
-build: CXXFLAGS += -O3
-build: $(RELEASE_OBJS)
+release: CXXFLAGS += -O3
+release: $(RELEASE_OBJS)
 	-mkdir bin
 	g++ $(RELEASE_OBJS) -o bin/$(EXE_FILE)
 	
