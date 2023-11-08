@@ -24,15 +24,16 @@ void run_command(int argc, char *argv[])
 			if (command == "validate")
 			{
 				exp.validate(pattern);
-				wcerr 	 << exp.output.str();
+				wcerr << exp.output.str();
 			}
 			else if (command == "run")
 			{
-				exp.generate(pattern);		
-				wcout << exp;
+				exp.generate(pattern);						
 			}
 				
 		}
+		// Validate will not produce any data output
+		wcout << exp;
 	}
 	else
 	{
@@ -48,10 +49,9 @@ void run_command(int argc, char *argv[])
 			else if (command == "run")
 			{
 				exp.generate(pattern);		
-				wcout << exp;
 			}
 		}
-		
+		// Validate will not produce any data output
 		wcout << exp;
 	}
 }
