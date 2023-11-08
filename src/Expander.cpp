@@ -294,6 +294,12 @@ bool Expander::validate(const wstring& pattern)
 
 		}
 	}
+	
+	if (loadBrackets != 0)
+	{
+		output << "Error: Unclosed group bracket" << endl;
+	}
+		
 
 	return ((loadQuotes % 2 == 0) && (loadBrackets % 2 == 0));
 }
