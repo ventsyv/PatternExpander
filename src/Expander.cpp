@@ -6,16 +6,20 @@ using namespace std;
 using namespace PatternExpander;
 
 Expander::Expander(wchar_t esc, wchar_t range, wchar_t grpBegin, wchar_t grpEnd) :
-		escapeSymbol(esc), rangeSymbol(range), groupBegin(grpBegin), groupEnd(grpEnd) {}
+		escapeSymbol(esc), rangeSymbol(range), groupBegin(grpBegin), groupEnd(
+				grpEnd)
+{
+}
 
 void Expander::generate(const wstring &pattern)
-{	
+{
 	vector<wstring> results;
 
 	//This will expand all range (a-b) expressions
 	wstring expandedPattern = expand(pattern);
 	size_t pLength = expandedPattern.length();
-	if (pLength == 0) {
+	if (pLength == 0)
+	{
 		return;
 	}
 
@@ -28,8 +32,8 @@ void Expander::generate(const wstring &pattern)
 	bool isFirstInGroup = true;
 	vector<wstring> partials;
 
-
-	for (uint i = 0; i < pLength; i++) {
+	for (uint i = 0; i < pLength; i++)
+	{
 		if (expandedPattern[i] == escapeSymbol) //escape character reached
 		{
 			if (isEscSeq(expandedPattern, i)) //check if the next character is a valid escape sequence
@@ -38,11 +42,15 @@ void Expander::generate(const wstring &pattern)
 				continue;
 			}
 
-		} else if (expandedPattern[i] == groupBegin && !escSeqReached) {
+		}
+		else if (expandedPattern[i] == groupBegin && !escSeqReached)
+		{
 			isFirstInGroup = true;
 			load++;
 			continue;
-		} else if (expandedPattern[i] == groupEnd && !escSeqReached) {
+		}
+		else if (expandedPattern[i] == groupEnd && !escSeqReached)
+		{
 			load--;
 			continue;
 		}
@@ -52,9 +60,10 @@ void Expander::generate(const wstring &pattern)
 		{
 			if (currentItem == 0) //data array is empty
 			{
-				results.push_back(wstring(1,expandedPattern[i]));
+				results.push_back(wstring(1, expandedPattern[i]));
 				currentItem++;
-			} else //variations are present.
+			}
+			else //variations are present.
 			{
 				//add the constant character to all variations
 				//Just appending the constant character to all patterns
@@ -63,7 +72,8 @@ void Expander::generate(const wstring &pattern)
 					results[j] = results[j] + pattern[i];
 				}
 			}
-		} else if (load > 0) //wchar_tacter inside a variable block
+		}
+		else if (load > 0) //wchar_tacter inside a variable block
 		{
 			//when we first enter the variable block, we save the
 			//existing patterns
@@ -81,12 +91,14 @@ void Expander::generate(const wstring &pattern)
 			//That means that the result set is empty
 			//If that's the case, just add the first item from the varible block
 			if (partials.empty())
-				results.push_back(wstring(1,expandedPattern[i]));
-			else {
+				results.push_back(wstring(1, expandedPattern[i]));
+			else
+			{
 				//The result set is not empty
 				//Append the first item of the variable block to the existing patterns,
 				//then add it the result set.
-				for (uint item = 0; item < partials.size(); item++) {
+				for (uint item = 0; item < partials.size(); item++)
+				{
 					results.push_back(partials[item] + expandedPattern[i]);
 				}
 			}
@@ -95,19 +107,19 @@ void Expander::generate(const wstring &pattern)
 		escSeqReached = false;
 	} //end for
 
-
 	data.insert(data.end(), results.begin(), results.end());
 }
 
-uint Expander::getBlockElements(const wstring& pattern, uint& start,
-		vector<wstring>& items)
+uint Expander::getBlockElements(const wstring &pattern, uint &start,
+		vector<wstring> &items)
 {
 	uint currentIndx = start; //remember we are going from right to left
 
 	//Find the end of the block
 	while (currentIndx >= 0) //we are going backwards
 	{
-		if (pattern[currentIndx] == groupBegin || pattern[currentIndx] == groupEnd)
+		if (pattern[currentIndx] == groupBegin
+				|| pattern[currentIndx] == groupEnd)
 			break; //reached the end of the block
 		currentIndx--;
 	}
@@ -134,9 +146,9 @@ uint Expander::getBlockElements(const wstring& pattern, uint& start,
 		}
 	} //end for
 	  //We should have the actual number of items
-	//*items = new wstring[itemCount];
+	  //*items = new wstring[itemCount];
 
-	//Extract the items
+	  //Extract the items
 	uint i = 0;
 	wstring temp;
 	for (currentIndx = endIndx + 1; currentIndx <= start; currentIndx++) //now we move left to right
@@ -160,7 +172,7 @@ uint Expander::getBlockElements(const wstring& pattern, uint& start,
 		{
 			//TODO: Check if we really need to have an exclude symbol
 //			if (pattern[currentIndx] != excludeSymbol)
-				items[i] = pattern[currentIndx];
+			items[i] = pattern[currentIndx];
 //			else
 //				(*items)[i] = "";
 //			i++;
@@ -176,23 +188,27 @@ uint Expander::getBlockElements(const wstring& pattern, uint& start,
 	return itemCount;
 }
 
-inline bool Expander::isEscSeq(const std::wstring& pattern, uint position) const
+inline bool Expander::isEscSeq(const std::wstring &pattern, uint position) const
 {
 	bool result = false;
 	if (position + 1 <= pattern.length() && pattern[position] == escapeSymbol) //first char. in sequence is indeed escape char.
 	{
 		//check second char in sequence
 		wchar_t second = pattern[position + 1];
-		if (second == escapeSymbol || second == rangeSymbol || second == groupBegin || second == groupEnd) {
+		if (second == escapeSymbol || second == rangeSymbol
+				|| second == groupBegin || second == groupEnd)
+		{
 			result = true;
-		} else {
-				result = false;
+		}
+		else
+		{
+			result = false;
 		}
 	}
 	return result;
 }
 
-std::wstring Expander::expand(const std::wstring& pattern)
+std::wstring Expander::expand(const std::wstring &pattern)
 {
 	int size = pattern.length();
 	wstring result = pattern;
@@ -217,12 +233,12 @@ std::wstring Expander::expand(const std::wstring& pattern)
 
 				wchar_t startRange = pattern[i - 1];
 				wchar_t endRange = pattern[i + 1];
-				
+
 				std::locale loc2("C.UTF8");
 
 				//if both are alphabetical chars
 				if ((isalpha(startRange, loc2) && isalpha(endRange, loc2))
-					|| (isdigit(startRange, loc2) && isdigit(endRange, loc2)))
+						|| (isdigit(startRange, loc2) && isdigit(endRange, loc2)))
 				{
 					if ((int) startRange < (int) endRange) //inorder
 					{
@@ -254,17 +270,17 @@ std::wstring Expander::expand(const std::wstring& pattern)
 	return result;
 }
 
-
-
-bool Expander::validate(const wstring& pattern)
+bool Expander::validate(const wstring &pattern)
 {
 	int loadBrackets = 0;
 	uint loadQuotes = 0;
 
 	for (uint i = 0; i < pattern.size(); i++)
 	{
-		if (pattern[i] == escapeSymbol) {
-			if (!isEscSeq(pattern, i)) {
+		if (pattern[i] == escapeSymbol)
+		{
+			if (!isEscSeq(pattern, i))
+			{
 				output << "Error: Invalid escape sequence detected" << endl;
 				output << pattern << endl;
 				output << std::setw(i) << "^" << endl;
@@ -294,17 +310,17 @@ bool Expander::validate(const wstring& pattern)
 
 		}
 	}
-	
+
 	if (loadBrackets != 0)
 	{
 		output << "Error: Unclosed group bracket" << endl;
 	}
-		
 
 	return ((loadQuotes % 2 == 0) && (loadBrackets % 2 == 0));
 }
 
-void Expander::getCombinations(vector<wstring>& data, vector<wstring>& newElements)
+void Expander::getCombinations(vector<wstring> &data,
+		vector<wstring> &newElements)
 {
 	vector<wstring> original = data;
 	vector<wstring> temp = data;
@@ -319,14 +335,14 @@ void Expander::getCombinations(vector<wstring>& data, vector<wstring>& newElemen
 	}
 
 	//If the initial list is empty, just add the first entity of the new list
-	if(numOrgElements == 0)
+	if (numOrgElements == 0)
 	{
 		data.push_back(newElements[0]);
 	}
 	else
 	{
 
-		for (int i= 0; i < numOrgElements; i++)
+		for (int i = 0; i < numOrgElements; i++)
 		{
 			data[i] = data[i] + newElements[0];
 		}
@@ -343,8 +359,7 @@ void Expander::getCombinations(vector<wstring>& data, vector<wstring>& newElemen
 	}
 }
 
-void Expander::processGroup(const wstring& pattern, uint& i,
-		uint& currentItem)
+void Expander::processGroup(const wstring &pattern, uint &i, uint &currentItem)
 {
 	//wstring* newItems = NULL;
 	vector<wstring> newItems;
@@ -388,6 +403,7 @@ void Expander::processGroup(const wstring& pattern, uint& i,
 	//delete[] newItems; //clean up temporary resource
 }
 
-std::vector<std::wstring> Expander::getData() {
+std::vector<std::wstring> Expander::getData()
+{
 	return data;
 }
