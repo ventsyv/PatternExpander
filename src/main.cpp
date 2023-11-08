@@ -53,8 +53,8 @@ int main(int argc, char *argv[])
     
     wstring usage = LR"(usage: patexp [-h | --help] <command> [<args>]
 	commands:
-		run: Generates strings from a list of patterns
-		validate: Validates if the patterns provided are syntaxically correct
+		run [<pat1> <pat2> .. ] | <stdin> : Generates strings from a list of patterns
+		validate [<pat1> <pat2> .. ] | <stdin> : Validates if the patterns provided are syntaxically correct
 		configure: Sets the various configuration options)";
 
 	if (argc > 1)
