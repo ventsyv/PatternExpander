@@ -23,7 +23,6 @@ void Expander::generate(const wstring &pattern)
 		return;
 	}
 
-	uint currentItem = 0; //current pattern in the data array
 	//Increment when unescaped [ is reached, decrement when ]
 	uint load = 0;
 	bool escSeqReached = false;
@@ -58,16 +57,15 @@ void Expander::generate(const wstring &pattern)
 		//it is a part of the pattern
 		if (load == 0) //constant character - escape sequences here are disregarded
 		{
-			if (currentItem == 0) //data array is empty
+			if (results.size() == 0) //data array is empty
 			{
 				results.push_back(wstring(1, expandedPattern[i]));
-				currentItem++;
 			}
 			else //variations are present.
 			{
 				//add the constant character to all variations
 				//Just appending the constant character to all patterns
-				for (uint j = 0; j < currentItem; j++)
+				for (size_t j = 0; j < results.size(); j++)
 				{
 					results[j] = results[j] + expandedPattern[i];
 				}

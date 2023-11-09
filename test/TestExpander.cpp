@@ -640,6 +640,30 @@ TEST_F(TestExpander, testGenerate_VariableBlock_EmbededVarBlock_Cyrilic)
 	EXPECT_EQ(data[8], L"3в");
 }
 
+TEST_F(TestExpander, testGenerate_VariableBlock_First)
+{
+
+	wstring pattern = L"[1-3]abc";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	EXPECT_EQ(data.size(), 3);
+	EXPECT_EQ(data[0], L"1abc");
+	EXPECT_EQ(data[1], L"2abc");
+	EXPECT_EQ(data[2], L"3abc");
+}
+
+TEST_F(TestExpander, testGenerate_VariableBlock_Middle)
+{
+
+	wstring pattern = L"ab[1-3]cd";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	EXPECT_EQ(data.size(), 3);
+	EXPECT_EQ(data[0], L"ab1cd");
+	EXPECT_EQ(data[1], L"ab2cd");
+	EXPECT_EQ(data[2], L"ab3cd");
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);
