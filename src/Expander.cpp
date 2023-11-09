@@ -212,6 +212,7 @@ std::wstring Expander::expand(const std::wstring &pattern)
 	wstring result = pattern;
 	wstring expanded;
 
+	uint load = 0;
 	for (int i = 0; i < size; i++)
 	{
 		if (isEscSeq(pattern, i))
@@ -219,7 +220,15 @@ std::wstring Expander::expand(const std::wstring &pattern)
 			i++;
 			continue;
 		}
-		else if (pattern[i] == rangeSymbol) //range symbol reached
+		else if (pattern[i] == groupBegin)
+		{
+			load++;
+		}
+		else if (pattern[i] == groupEnd)
+		{
+			load--;
+		}
+		else if (pattern[i] == rangeSymbol && load > 0) //range symbol reached
 		{
 			expanded = L"";
 			if (i - 1 < 0 || i + 1 >= size)
@@ -257,7 +266,7 @@ std::wstring Expander::expand(const std::wstring &pattern)
 					return L""; //range does not seem valid
 				result = preStr + expanded + postStr;
 				size = pattern.length();
-				i += 2;
+				//i += 2;
 			}
 		}
 		//result = "";

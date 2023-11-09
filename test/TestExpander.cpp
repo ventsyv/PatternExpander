@@ -640,7 +640,7 @@ TEST_F(TestExpander, testGenerate_VariableBlock_EmbededVarBlock_Cyrilic)
 	EXPECT_EQ(data[8], L"3в");
 }
 
-TEST_F(TestExpander, testGenerate_VariableBlock_First)
+TEST_F(TestExpander, testGenerate_VariableBlock_Beginning)
 {
 
 	wstring pattern = L"[1-3]abc";
@@ -663,6 +663,50 @@ TEST_F(TestExpander, testGenerate_VariableBlock_Middle)
 	EXPECT_EQ(data[1], L"ab2cd");
 	EXPECT_EQ(data[2], L"ab3cd");
 }
+
+TEST_F(TestExpander, testGenerate_Static_Range_Beginning)
+{
+
+	wstring pattern = L"a-c[1-3]";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	EXPECT_EQ(data.size(), 3);
+	EXPECT_EQ(data[0], L"a-c1");
+	EXPECT_EQ(data[1], L"a-c2");
+	EXPECT_EQ(data[2], L"a-c3");
+}
+
+
+TEST_F(TestExpander, testGenerate_Static_Range_Middle)
+{
+
+	wstring pattern = L"[1-3]a-c[1-3]";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	EXPECT_EQ(data.size(), 9);
+	EXPECT_EQ(data[0], L"1a-c1");
+	EXPECT_EQ(data[1], L"2a-c1");
+	EXPECT_EQ(data[2], L"3a-c1");
+	EXPECT_EQ(data[3], L"1a-c2");
+	EXPECT_EQ(data[4], L"2a-c2");
+	EXPECT_EQ(data[5], L"3a-c2");
+	EXPECT_EQ(data[6], L"1a-c3");
+	EXPECT_EQ(data[7], L"2a-c3");
+	EXPECT_EQ(data[8], L"3a-c3");
+}
+
+TEST_F(TestExpander, testGenerate_Static_Range_End)
+{
+
+	wstring pattern = L"[1-3]a-c";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	EXPECT_EQ(data.size(), 3);
+	EXPECT_EQ(data[0], L"1a-c");
+	EXPECT_EQ(data[1], L"2a-c");
+	EXPECT_EQ(data[2], L"3a-c");
+}
+
 
 int main(int argc, char **argv)
 {
