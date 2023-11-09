@@ -69,7 +69,7 @@ void Expander::generate(const wstring &pattern)
 				//Just appending the constant character to all patterns
 				for (uint j = 0; j < currentItem; j++)
 				{
-					results[j] = results[j] + pattern[i];
+					results[j] = results[j] + expandedPattern[i];
 				}
 			}
 		}
@@ -116,7 +116,7 @@ uint Expander::getBlockElements(const wstring &pattern, uint &start,
 	uint currentIndx = start; //remember we are going from right to left
 
 	//Find the end of the block
-	while (currentIndx >= 0) //we are going backwards
+	while (currentIndx != 0) //we are going backwards
 	{
 		if (pattern[currentIndx] == groupBegin
 				|| pattern[currentIndx] == groupEnd)
@@ -316,6 +316,11 @@ bool Expander::validate(const wstring &pattern)
 		output << "Error: Unclosed group bracket" << endl;
 	}
 
+	if (loadQuotes %2 != 0)
+	{
+		output << "Error: Unclosed quote detected" << endl;
+	}
+
 	return ((loadQuotes % 2 == 0) && (loadBrackets % 2 == 0));
 }
 
@@ -325,8 +330,8 @@ void Expander::getCombinations(vector<wstring> &data,
 	vector<wstring> original = data;
 	vector<wstring> temp = data;
 
-	uint numNewElements = newElements.size();
-	uint numOrgElements = original.size();
+	auto numNewElements = newElements.size();
+	auto numOrgElements = original.size();
 
 	//Nothing to do, just return
 	if (numNewElements == 0)
@@ -342,15 +347,15 @@ void Expander::getCombinations(vector<wstring> &data,
 	else
 	{
 
-		for (int i = 0; i < numOrgElements; i++)
+		for (size_t i = 0; i < numOrgElements; i++)
 		{
 			data[i] = data[i] + newElements[0];
 		}
 	}
 
-	for (int i = 1; i < numNewElements; i++)
+	for (size_t i = 1; i < numNewElements; i++)
 	{
-		for (int j = 0; j < numOrgElements; j++)
+		for (size_t j = 0; j < numOrgElements; j++)
 		{
 			temp[j] = temp[j] + newElements[i];
 		}
@@ -389,7 +394,7 @@ void Expander::processGroup(const wstring &pattern, uint &i, uint &currentItem)
 		}
 		//do the actual combination
 		int indx = 0; //current block element
-		for (int k = 0; k < currentItem; k++)
+		for (uint k = 0; k < currentItem; k++)
 		{
 
 			if (k != 0 && k % nDataElements == 0)
