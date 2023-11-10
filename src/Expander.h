@@ -123,7 +123,9 @@ private:
 	void processGroup(const std::wstring &pattern, uint &i, uint &currentItem);
 
 	bool getLoadBalance(const std::wstring &pattern);
-
+	void append(std::vector<std::wstring> &results,
+			const std::wstring &newData);
+	void appendGroup(bool &isFirstInGroup, const std::wstring &newData, std::vector<std::wstring> &partials, std::vector<std::wstring> &results);
 };
 
 } //end namespace

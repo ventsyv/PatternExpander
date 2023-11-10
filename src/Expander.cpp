@@ -11,6 +11,53 @@ Expander::Expander(wchar_t esc, wchar_t range, wchar_t grpBegin, wchar_t grpEnd)
 {
 }
 
+void Expander::append(vector<wstring> &results, const wstring &newData)
+{
+	if (results.size() == 0) //data array is empty
+	{
+		results.push_back(newData);
+	}
+	else //variations are present.
+	{
+		//add the constant character to all variations
+		//Just appending the constant character to all patterns
+		for (size_t j = 0; j < results.size(); j++)
+		{
+			results[j] = results[j] + newData;
+		}
+	}
+}
+
+void Expander::appendGroup(bool &isFirstInGroup, const wstring &newData, vector<wstring> &partials, vector<wstring> &results)
+{
+	//when we first enter the variable block, we save the
+	//existing patterns
+	if (isFirstInGroup)
+	{
+		partials = results;
+		//The variable block is not optional, so we need to clear the result set
+		//For example: 1[a-c] is expected to produce 1a, 1b, 1c
+		//Without the clear, it produces 1, 1a, 1b, 1c
+		results.clear();
+		isFirstInGroup = false;
+	}
+	//It's possible the variable block appears first in the pattern
+	//That means that the result set is empty
+	//If that's the case, just add the first item from the varible block
+	if (partials.empty())
+		results.push_back(newData);
+	else
+	{
+		//The result set is not empty
+		//Append the first item of the variable block to the existing patterns,
+		//then add it the result set.
+		for (uint item = 0; item < partials.size(); item++)
+		{
+			results.push_back(partials[item] + newData);
+		}
+	}
+}
+
 void Expander::generate(const wstring &pattern)
 {
 	vector<wstring> results;
@@ -53,54 +100,37 @@ void Expander::generate(const wstring &pattern)
 			load--;
 			continue;
 		}
+		else if (expandedPattern[i] == DOUBLE_QUOTE)
+		{
+			//Just skip everything thats in quotes
+			uint startIndex = ++i;
+			while (expandedPattern[i] != DOUBLE_QUOTE && i < pLength)
+			{
+				i++;
+			}
 
-		//it is a part of the pattern
+			uint numChars = i - startIndex;
+			wstring quotedStr = expandedPattern.substr(startIndex, numChars);
+			if (load == 0) //constant character - escape sequences here are disregarded
+			{
+				append(results, quotedStr);
+			}
+			else if (load > 0) //wchar_tacter inside a variable block
+			{
+				appendGroup(isFirstInGroup, quotedStr, partials, results);
+			}
+			//Skip the trailing quote
+			continue;
+		}
+
 		if (load == 0) //constant character - escape sequences here are disregarded
 		{
-			if (results.size() == 0) //data array is empty
-			{
-				results.push_back(wstring(1, expandedPattern[i]));
-			}
-			else //variations are present.
-			{
-				//add the constant character to all variations
-				//Just appending the constant character to all patterns
-				for (size_t j = 0; j < results.size(); j++)
-				{
-					results[j] = results[j] + expandedPattern[i];
-				}
-			}
+			append(results, wstring(1,expandedPattern[i]));
 		}
 		else if (load > 0) //wchar_tacter inside a variable block
 		{
-			//when we first enter the variable block, we save the
-			//existing patterns
-			if (isFirstInGroup)
-			{
-				partials = results;
-				//The variable block is not optional, so we need to clear the result set
-				//For example: 1[a-c] is expected to produce 1a, 1b, 1c
-				//Without the clear, it produces 1, 1a, 1b, 1c
-				results.clear();
-				isFirstInGroup = false;
-			}
-
-			//It's possible the variable block appears first in the pattern
-			//That means that the result set is empty
-			//If that's the case, just add the first item from the varible block
-			if (partials.empty())
-				results.push_back(wstring(1, expandedPattern[i]));
-			else
-			{
-				//The result set is not empty
-				//Append the first item of the variable block to the existing patterns,
-				//then add it the result set.
-				for (uint item = 0; item < partials.size(); item++)
-				{
-					results.push_back(partials[item] + expandedPattern[i]);
-				}
-			}
-
+			auto newData = wstring(1,expandedPattern[i]);
+			appendGroup(isFirstInGroup, newData, partials, results);
 		}
 		escSeqReached = false;
 	} //end for
@@ -219,6 +249,15 @@ std::wstring Expander::expand(const std::wstring &pattern)
 		{
 			i++;
 			continue;
+		}
+		else if (pattern[i] == DOUBLE_QUOTE)
+		{
+			//Just skip everything thats in quotes
+			i++;
+			while (pattern[i] != DOUBLE_QUOTE && i < size)
+			{
+				i++;
+			}
 		}
 		else if (pattern[i] == groupBegin)
 		{

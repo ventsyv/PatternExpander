@@ -707,6 +707,28 @@ TEST_F(TestExpander, testGenerate_Static_Range_End)
 	EXPECT_EQ(data[2], L"3a-c");
 }
 
+TEST_F(TestExpander, testGenerate_QuotedString_InGroup)
+{
+
+	wstring pattern = L"a[b\"123\"c]\"";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	EXPECT_EQ(data.size(), 3);
+	EXPECT_EQ(data[0], L"ab");
+	EXPECT_EQ(data[1], L"a123");
+	EXPECT_EQ(data[2], L"ac");
+}
+
+TEST_F(TestExpander, testGenerate_QuotedString)
+{
+
+	wstring pattern = L"\"[a-c]\"";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	EXPECT_EQ(data.size(), 1);
+	EXPECT_EQ(data[0], L"[a-c]");
+}
+
 
 int main(int argc, char **argv)
 {
