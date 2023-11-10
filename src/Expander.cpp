@@ -115,7 +115,7 @@ void Expander::generate(const wstring &pattern)
 			{
 				append(results, quotedStr);
 			}
-			else if (load > 0) //wchar_tacter inside a variable block
+			else if (load > 0) //character inside a variable block
 			{
 				appendGroup(isFirstInGroup, quotedStr, partials, results);
 			}
@@ -127,7 +127,7 @@ void Expander::generate(const wstring &pattern)
 		{
 			append(results, wstring(1,expandedPattern[i]));
 		}
-		else if (load > 0) //wchar_tacter inside a variable block
+		else if (load > 0) //character inside a variable block
 		{
 			auto newData = wstring(1,expandedPattern[i]);
 			appendGroup(isFirstInGroup, newData, partials, results);
