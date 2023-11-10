@@ -82,7 +82,7 @@ void Expander::generate(const wstring &pattern)
 	{
 		if (expandedPattern[i] == escapeSymbol) //escape character reached
 		{
-			if (isEscSeq(expandedPattern, i)) //check if the next character is a valid escape sequence
+			if (isEscSeq(expandedPattern, i, load > 0)) //check if the next character is a valid escape sequence
 			{
 				escSeqReached = true;
 				continue;
@@ -158,7 +158,7 @@ uint Expander::getBlockElements(const wstring &pattern, uint &start,
 	for (currentIndx = endIndx + 1; currentIndx <= start; currentIndx++)
 	{
 		//count one less character since escape sequences (two character) are counted as one character
-		if (isEscSeq(pattern, currentIndx))
+		if (isEscSeq(pattern, currentIndx, true))
 			itemCount--;
 		//Starting a constant block - multiple character are counted as one item
 		else if (pattern[currentIndx] == '"')
@@ -196,7 +196,7 @@ uint Expander::getBlockElements(const wstring &pattern, uint &start,
 			items[i] = temp;
 			i++;
 		}
-		else if (!isEscSeq(pattern, currentIndx)) //just normal characters
+		else if (!isEscSeq(pattern, currentIndx, true)) //just normal characters
 		{
 			//TODO: Check if we really need to have an exclude symbol
 //			if (pattern[currentIndx] != excludeSymbol)
@@ -205,7 +205,7 @@ uint Expander::getBlockElements(const wstring &pattern, uint &start,
 //				(*items)[i] = "";
 //			i++;
 		}
-		else if (isEscSeq(pattern, currentIndx))
+		else if (isEscSeq(pattern, currentIndx, true))
 		{
 			currentIndx++; //get the escaped character
 			items[i] = pattern[currentIndx];
@@ -216,15 +216,23 @@ uint Expander::getBlockElements(const wstring &pattern, uint &start,
 	return itemCount;
 }
 
-inline bool Expander::isEscSeq(const std::wstring &pattern, uint position) const
+inline bool Expander::isEscSeq(const std::wstring &pattern, uint position, bool isInGroup) const
 {
 	bool result = false;
 	if (position + 1 <= pattern.length() && pattern[position] == escapeSymbol) //first char. in sequence is indeed escape char.
 	{
 		//check second char in sequence
 		wchar_t second = pattern[position + 1];
-		if (second == escapeSymbol || second == rangeSymbol
-				|| second == groupBegin || second == groupEnd)
+
+		//Range symbols are only valid in a group so no need to escape if we are not in one
+		if (isInGroup)
+		{
+			if (second == rangeSymbol)
+				return true;
+
+		}
+
+		if (second == escapeSymbol || second == groupBegin || second == groupEnd)
 		{
 			result = true;
 		}
@@ -232,7 +240,7 @@ inline bool Expander::isEscSeq(const std::wstring &pattern, uint position) const
 		{
 			result = false;
 		}
-	}
+}
 	return result;
 }
 
@@ -245,7 +253,7 @@ std::wstring Expander::expand(const std::wstring &pattern)
 	uint load = 0;
 	for (int i = 0; i < size; i++)
 	{
-		if (isEscSeq(pattern, i))
+		if (isEscSeq(pattern, i, load > 0))
 		{
 			i++;
 			continue;
@@ -272,7 +280,7 @@ std::wstring Expander::expand(const std::wstring &pattern)
 			expanded = L"";
 			if (i - 1 < 0 || i + 1 >= size)
 				return L"";
-			else if (!isEscSeq(pattern, i)) //the character was not escaped
+			else if (!isEscSeq(pattern, i, load > 0)) //the character was not escaped
 			{
 				wstring preStr = result.substr(0, i - 1); //the presiding str
 				wstring postStr = result.substr(i + 2, size - (i + 2)); //the rest of the original str
@@ -325,7 +333,7 @@ bool Expander::validate(const wstring &pattern)
 	{
 		if (pattern[i] == escapeSymbol)
 		{
-			if (!isEscSeq(pattern, i))
+			if (!isEscSeq(pattern, i, loadBrackets > 0))
 			{
 				output << "Error: Invalid escape sequence detected" << endl;
 				output << pattern << endl;

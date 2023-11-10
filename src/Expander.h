@@ -103,7 +103,7 @@ private:
 	std::wstring expand(const std::wstring &pattern);
 
 	///Returns true if a valid escape sequence is present at the given position
-	bool isEscSeq(const std::wstring &pattern, uint position) const;
+	bool isEscSeq(const std::wstring &pattern, uint position, bool isInGroup) const;
 
 	/**A character set is a group of characters surrounded by []
 	 * Characters can be listed individually - [abc]
