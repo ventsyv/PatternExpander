@@ -100,7 +100,7 @@ void Expander::generate(const wstring &pattern)
 			load--;
 			continue;
 		}
-		else if (expandedPattern[i] == DOUBLE_QUOTE)
+		else if (expandedPattern[i] == DOUBLE_QUOTE && !escSeqReached)
 		{
 			//Just skip everything thats in quotes
 			uint startIndex = ++i;
@@ -232,7 +232,7 @@ inline bool Expander::isEscSeq(const std::wstring &pattern, uint position, bool 
 
 		}
 
-		if (second == escapeSymbol || second == groupBegin || second == groupEnd)
+		if (second == escapeSymbol || second == groupBegin || second == groupEnd || second == DOUBLE_QUOTE)
 		{
 			result = true;
 		}
