@@ -71,7 +71,7 @@ TEST_F(TestExpander, testValidation_valid)
 
 TEST_F(TestExpander, testValidation_validEscSeqs_Dash)
 {
-	//A pattern with valid escape seq
+	//Static block - no need to escape the range
 	wstring pattern = L"abc/-d";
 	bool result = underTest.validate(pattern);
 	EXPECT_TRUE(result);
@@ -95,7 +95,7 @@ TEST_F(TestExpander, testValidation_validEscSeqs_GroupEnd)
 
 TEST_F(TestExpander, testValidation_validEscSeqs_EscChar)
 {
-	//A pattern with valid escape seq
+	//No need to escape the escapet when the next val is not a valid esc sequence
 	wstring pattern = L"abc//d";
 	bool result = underTest.validate(pattern);
 	EXPECT_TRUE(result);
@@ -163,16 +163,18 @@ TEST_F(TestExpander, testGenerate_StaticBlock_EscGrpEnd)
 
 TEST_F(TestExpander, testGenerate_StaticBlock_EscDash)
 {
+	//No need to escape dashes when they are in a static block
 	wstring pattern = L"abc/-d";
 	underTest.generate(pattern);
 	auto data = underTest.getData();
 	EXPECT_EQ(data.size(), 1);
-	EXPECT_EQ(data[0], L"abc-d");
+	EXPECT_EQ(data[0], L"abc/-d");
 }
 
 TEST_F(TestExpander, testGenerate_StaticBlock_EscEscChar)
 {
 
+	//No need to escape / when the next char is not a valid esc sequence
 	wstring pattern = L"abc//d";
 	underTest.generate(pattern);
 	auto data = underTest.getData();
@@ -360,7 +362,7 @@ TEST_F(TestExpander, testGenerate_StaticBlock_EscDash_alt)
 	altExpander.generate(pattern);
 	auto data = altExpander.getData();
 	EXPECT_EQ(data.size(), 1);
-	EXPECT_EQ(data[0], L"abc>d");
+	EXPECT_EQ(data[0], L"abc#>d");
 }
 
 TEST_F(TestExpander, testGenerate_StaticBlock_EscEscChar_alt)
@@ -553,7 +555,7 @@ TEST_F(TestExpander, testGenerate_StaticBlock_EscDash_Cyrilic)
 	underTest.generate(pattern);
 	auto data = underTest.getData();
 	EXPECT_EQ(data.size(), 1);
-	EXPECT_EQ(data[0], L"абв-г");
+	EXPECT_EQ(data[0], L"абв/-г");
 }
 
 TEST_F(TestExpander, testGenerate_StaticBlock_EscEscChar_Cyrilic)
@@ -729,6 +731,67 @@ TEST_F(TestExpander, testGenerate_QuotedString)
 	EXPECT_EQ(data[0], L"[a-c]");
 }
 
+TEST_F(TestExpander, testGenerate_VariableBlock_EscRange)
+{
+	wstring pattern = L"a-c[1-3]";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	EXPECT_EQ(data.size(), 3);
+	EXPECT_EQ(data[0], L"a-c1");
+	EXPECT_EQ(data[1], L"a-c2");
+	EXPECT_EQ(data[2], L"a-c3");
+}
+
+TEST_F(TestExpander, testGenerate_VariableBlock_EscRange_InGroup)
+{
+	wstring pattern = L"[a/-c]";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	EXPECT_EQ(data.size(), 3);
+	EXPECT_EQ(data[0], L"a");
+	EXPECT_EQ(data[1], L"-");
+	EXPECT_EQ(data[2], L"c");
+}
+
+TEST_F(TestExpander, testGenerate_VariableBlock_EscEscape)
+{
+	wstring pattern = L"a[b///-d]";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	EXPECT_EQ(data.size(), 4);
+	EXPECT_EQ(data[0], L"ab");
+	EXPECT_EQ(data[1], L"a/");
+	EXPECT_EQ(data[2], L"a-");
+	EXPECT_EQ(data[3], L"ad");
+
+}
+
+TEST_F(TestExpander, testGenerate_VariableBlock_EscQuote)
+{
+	// a[/"b-d]
+	wstring pattern = L"a[/\"b-d]";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	EXPECT_EQ(data.size(), 4);
+	EXPECT_EQ(data[0], L"a\"");
+	EXPECT_EQ(data[1], L"ab");
+	EXPECT_EQ(data[2], L"ac");
+	EXPECT_EQ(data[3], L"ad");
+
+}
+
+TEST_F(TestExpander, testGenerate_VariableBlock_EscQuote_OutsideGroup)
+{
+	// /"[a-c]/" Since the queotes are escaped [a-c] is expanded and you end up with : "a" "b" "c"
+	wstring pattern = LR"(/"[a-c]/")";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	EXPECT_EQ(data.size(), 3);
+	EXPECT_EQ(data[0], L"\"a\"");
+	EXPECT_EQ(data[1], L"\"b\"");
+	EXPECT_EQ(data[2], L"\"c\"");
+
+}
 
 int main(int argc, char **argv)
 {
