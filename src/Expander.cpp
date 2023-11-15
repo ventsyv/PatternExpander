@@ -80,7 +80,8 @@ void Expander::generate(const wstring &pattern)
 
 	for (uint i = 0; i < pLength; i++)
 	{
-		if (expandedPattern[i] == escapeSymbol) //escape character reached
+		//check if a new escape sequence is reached
+		if (expandedPattern[i] == escapeSymbol && !escSeqReached)
 		{
 			if (isEscSeq(expandedPattern, i, load > 0)) //check if the next character is a valid escape sequence
 			{
@@ -331,19 +332,10 @@ bool Expander::validate(const wstring &pattern)
 
 	for (uint i = 0; i < pattern.size(); i++)
 	{
-		if (pattern[i] == escapeSymbol)
+
+		if (isEscSeq(pattern, i, loadBrackets > 0))
 		{
-			if (!isEscSeq(pattern, i, loadBrackets > 0))
-			{
-				output << "Error: Invalid escape sequence detected" << endl;
-				output << pattern << endl;
-				output << std::setw(i) << "^" << endl;
-				return false;
-			}
-			else
-			{
-				i++;
-			}
+			i++;
 		}
 		else
 		{
