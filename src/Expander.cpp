@@ -8,9 +8,9 @@
 using namespace std;
 using namespace PatternExpander;
 
-Expander::Expander(wchar_t esc, wchar_t range, wchar_t grpBegin, wchar_t grpEnd) :
+Expander::Expander(wchar_t esc, wchar_t range, wchar_t grpBegin, wchar_t grpEnd, wchar_t quote) :
 		escapeSymbol(esc), rangeSymbol(range), groupBegin(grpBegin), groupEnd(
-				grpEnd)
+				grpEnd), quote(quote)
 {
 	loadConfig();
 }
