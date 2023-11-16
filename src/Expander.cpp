@@ -166,13 +166,13 @@ uint Expander::getBlockElements(const wstring &pattern, uint &start,
 		if (isEscSeq(pattern, currentIndx, true))
 			itemCount--;
 		//Starting a constant block - multiple character are counted as one item
-		else if (pattern[currentIndx] == '"')
+		else if (pattern[currentIndx] == quote)
 		{
 			currentIndx++; //move inside the quote
 			while (currentIndx <= start)
 			{
 				itemCount--;
-				if (pattern[currentIndx] == '"')
+				if (pattern[currentIndx] == quote)
 					break;
 				currentIndx++;
 			}
@@ -187,12 +187,12 @@ uint Expander::getBlockElements(const wstring &pattern, uint &start,
 	for (currentIndx = endIndx + 1; currentIndx <= start; currentIndx++) //now we move left to right
 	{
 
-		if (pattern[currentIndx] == '"')
+		if (pattern[currentIndx] == quote)
 		{
 			uint strt = ++currentIndx; //move inside the quote
 			while (currentIndx < start)
 			{
-				if (pattern[currentIndx] == '"')
+				if (pattern[currentIndx] == quote)
 					break;
 				currentIndx++;
 			}
