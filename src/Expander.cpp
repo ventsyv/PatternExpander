@@ -105,11 +105,11 @@ void Expander::generate(const wstring &pattern)
 			load--;
 			continue;
 		}
-		else if (expandedPattern[i] == DOUBLE_QUOTE && !escSeqReached)
+		else if (expandedPattern[i] == DEFAULT_QUOTE_SYM && !escSeqReached)
 		{
 			//Just skip everything thats in quotes
 			uint startIndex = ++i;
-			while (expandedPattern[i] != DOUBLE_QUOTE && i < pLength)
+			while (expandedPattern[i] != DEFAULT_QUOTE_SYM && i < pLength)
 			{
 				i++;
 			}
@@ -237,7 +237,7 @@ inline bool Expander::isEscSeq(const std::wstring &pattern, uint position, bool 
 
 		}
 
-		if (second == escapeSymbol || second == groupBegin || second == groupEnd || second == DOUBLE_QUOTE)
+		if (second == escapeSymbol || second == groupBegin || second == groupEnd || second == DEFAULT_QUOTE_SYM)
 		{
 			result = true;
 		}
@@ -263,11 +263,11 @@ std::wstring Expander::expand(const std::wstring &pattern)
 			i++;
 			continue;
 		}
-		else if (pattern[i] == DOUBLE_QUOTE)
+		else if (pattern[i] == DEFAULT_QUOTE_SYM)
 		{
 			//Just skip everything thats in quotes
 			i++;
-			while (pattern[i] != DOUBLE_QUOTE && i < size)
+			while (pattern[i] != DEFAULT_QUOTE_SYM && i < size)
 			{
 				i++;
 			}
@@ -347,7 +347,7 @@ bool Expander::validate(const wstring &pattern)
 				loadBrackets++;
 			else if (pattern[i] == groupEnd)
 				loadBrackets--;
-			else if (pattern[i] == DOUBLE_QUOTE)
+			else if (pattern[i] == DEFAULT_QUOTE_SYM)
 				loadQuotes++;
 
 			if (loadBrackets < 0)

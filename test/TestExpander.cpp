@@ -32,10 +32,10 @@ TEST_F(TestExpander, testGetters)
 	EXPECT_EQ(PatternExpander::DEFAULT_RANGE_SYM, result);
 
 	result = underTest.getGroupBegin();
-	EXPECT_EQ(PatternExpander::GROUP_SYM_BEGIN, result);
+	EXPECT_EQ(PatternExpander::DEFAULT_GROUP_BEGIN_SYM, result);
 
 	result = underTest.getGroupEnd();
-	EXPECT_EQ(PatternExpander::GROUP_SYM_END, result);
+	EXPECT_EQ(PatternExpander::DEFAULT_GROUP_END_SYM, result);
 }
 
 TEST_F(TestExpander, testSetters)
@@ -800,8 +800,8 @@ TEST_F(TestExpander, testLoadConfig)
 	underTest.loadConfig("./nofile.txt");
 
 	EXPECT_EQ(underTest.getEscChar(), PatternExpander::DEFAULT_ESC_SYM);
-	EXPECT_EQ(underTest.getGroupBegin(), PatternExpander::GROUP_SYM_BEGIN);
-	EXPECT_EQ(underTest.getGroupEnd(), PatternExpander::GROUP_SYM_END);
+	EXPECT_EQ(underTest.getGroupBegin(), PatternExpander::DEFAULT_GROUP_BEGIN_SYM);
+	EXPECT_EQ(underTest.getGroupEnd(), PatternExpander::DEFAULT_GROUP_END_SYM);
 	EXPECT_EQ(underTest.getRangeChar(), PatternExpander::DEFAULT_RANGE_SYM);
 
 	altExpander.loadConfig("./nofile.txt");
