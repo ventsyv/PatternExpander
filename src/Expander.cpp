@@ -1,6 +1,9 @@
 #include "Expander.h"
 #include <string>
+#include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <algorithm>
 
 using namespace std;
 using namespace PatternExpander;
@@ -9,6 +12,7 @@ Expander::Expander(wchar_t esc, wchar_t range, wchar_t grpBegin, wchar_t grpEnd)
 		escapeSymbol(esc), rangeSymbol(range), groupBegin(grpBegin), groupEnd(
 				grpEnd)
 {
+	loadConfig();
 }
 
 void Expander::append(vector<wstring> &results, const wstring &newData)
@@ -457,4 +461,48 @@ void Expander::processGroup(const wstring &pattern, uint &i, uint &currentItem)
 std::vector<std::wstring> Expander::getData()
 {
 	return data;
+}
+
+void Expander::loadConfig(const std::string& filePath)
+{
+
+	wifstream in(filePath, ios::in);
+	while (in)
+	{
+		wstring key;
+		wstring val;
+		in >> key >> val;
+
+		std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+
+		if (key == L"range")
+		{
+			setRangeChar(val[0]);
+		}
+		else if (key == L"escape")
+		{
+			setEscChar(val[0]);
+		}
+		else if (key == L"group.begin")
+		{
+			setGroupBegin(val[0]);
+		}
+		else if (key == L"group.end")
+		{
+			setGroupEnd(val[0]);
+		}
+	}
+
+}
+
+void Expander::saveConfig(const std::string& filePath)
+{
+	wofstream out(filePath, ios::out);
+
+	out << L"range " << getRangeChar() << std::endl;
+	out << L"escape " << getEscChar() << endl;
+
+	out << L"group.begin " << getGroupBegin() << endl;
+	out << L"group.end " << getGroupEnd() << endl;
+
 }
