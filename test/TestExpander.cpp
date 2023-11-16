@@ -721,13 +721,25 @@ TEST_F(TestExpander, testGenerate_Static_Range_End)
 TEST_F(TestExpander, testGenerate_QuotedString_InGroup)
 {
 
-	wstring pattern = L"a[b\"123\"c]\"";
+	wstring pattern = L"a[b\"123\"c]";
 	underTest.generate(pattern);
 	auto data = underTest.getData();
 	EXPECT_EQ(data.size(), 3);
 	EXPECT_EQ(data[0], L"ab");
 	EXPECT_EQ(data[1], L"a123");
 	EXPECT_EQ(data[2], L"ac");
+}
+
+TEST_F(TestExpander, testGenerate_QuotedString_InGroup_AltQuote)
+{
+
+	wstring pattern = L"a{b^123^c}";
+	altExpander.generate(pattern);
+	auto data = altExpander.getData();
+	EXPECT_EQ(data.size(), 3);
+	//EXPECT_EQ(data[0], L"ab");
+	//EXPECT_EQ(data[1], L"a123");
+	//EXPECT_EQ(data[2], L"ac");
 }
 
 TEST_F(TestExpander, testGenerate_QuotedString)
@@ -739,6 +751,17 @@ TEST_F(TestExpander, testGenerate_QuotedString)
 	EXPECT_EQ(data.size(), 1);
 	EXPECT_EQ(data[0], L"[a-c]");
 }
+
+TEST_F(TestExpander, testGenerate_QuotedString_AltQuote)
+{
+
+	wstring pattern = L"^[a-c]^";
+	altExpander.generate(pattern);
+	auto data = altExpander.getData();
+	EXPECT_EQ(data.size(), 1);
+	EXPECT_EQ(data[0], L"[a-c]");
+}
+
 
 TEST_F(TestExpander, testGenerate_VariableBlock_EscRange)
 {
@@ -783,6 +806,19 @@ TEST_F(TestExpander, testGenerate_VariableBlock_EscQuote)
 	auto data = underTest.getData();
 	EXPECT_EQ(data.size(), 4);
 	EXPECT_EQ(data[0], L"a\"");
+	EXPECT_EQ(data[1], L"ab");
+	EXPECT_EQ(data[2], L"ac");
+	EXPECT_EQ(data[3], L"ad");
+
+}
+
+TEST_F(TestExpander, testGenerate_VariableBlock_EscAltQuote)
+{
+	wstring pattern = L"a{#^b>d}";
+	altExpander.generate(pattern);
+	auto data = altExpander.getData();
+	ASSERT_EQ(data.size(), 4);
+	EXPECT_EQ(data[0], L"a^");
 	EXPECT_EQ(data[1], L"ab");
 	EXPECT_EQ(data[2], L"ac");
 	EXPECT_EQ(data[3], L"ad");
