@@ -8,9 +8,9 @@
 using namespace std;
 using namespace PatternExpander;
 
-Expander::Expander(wchar_t esc, wchar_t range, wchar_t grpBegin, wchar_t grpEnd) :
+Expander::Expander(wchar_t esc, wchar_t range, wchar_t grpBegin, wchar_t grpEnd, wchar_t quote) :
 		escapeSymbol(esc), rangeSymbol(range), groupBegin(grpBegin), groupEnd(
-				grpEnd)
+				grpEnd), quote(quote)
 {
 	loadConfig();
 }
@@ -105,11 +105,11 @@ void Expander::generate(const wstring &pattern)
 			load--;
 			continue;
 		}
-		else if (expandedPattern[i] == DOUBLE_QUOTE && !escSeqReached)
+		else if (expandedPattern[i] == quote && !escSeqReached)
 		{
 			//Just skip everything thats in quotes
 			uint startIndex = ++i;
-			while (expandedPattern[i] != DOUBLE_QUOTE && i < pLength)
+			while (expandedPattern[i] != quote && i < pLength)
 			{
 				i++;
 			}
@@ -166,13 +166,13 @@ uint Expander::getBlockElements(const wstring &pattern, uint &start,
 		if (isEscSeq(pattern, currentIndx, true))
 			itemCount--;
 		//Starting a constant block - multiple character are counted as one item
-		else if (pattern[currentIndx] == '"')
+		else if (pattern[currentIndx] == quote)
 		{
 			currentIndx++; //move inside the quote
 			while (currentIndx <= start)
 			{
 				itemCount--;
-				if (pattern[currentIndx] == '"')
+				if (pattern[currentIndx] == quote)
 					break;
 				currentIndx++;
 			}
@@ -187,12 +187,12 @@ uint Expander::getBlockElements(const wstring &pattern, uint &start,
 	for (currentIndx = endIndx + 1; currentIndx <= start; currentIndx++) //now we move left to right
 	{
 
-		if (pattern[currentIndx] == '"')
+		if (pattern[currentIndx] == quote)
 		{
 			uint strt = ++currentIndx; //move inside the quote
 			while (currentIndx < start)
 			{
-				if (pattern[currentIndx] == '"')
+				if (pattern[currentIndx] == quote)
 					break;
 				currentIndx++;
 			}
@@ -237,7 +237,7 @@ inline bool Expander::isEscSeq(const std::wstring &pattern, uint position, bool 
 
 		}
 
-		if (second == escapeSymbol || second == groupBegin || second == groupEnd || second == DOUBLE_QUOTE)
+		if (second == escapeSymbol || second == groupBegin || second == groupEnd || second == quote)
 		{
 			result = true;
 		}
@@ -263,11 +263,11 @@ std::wstring Expander::expand(const std::wstring &pattern)
 			i++;
 			continue;
 		}
-		else if (pattern[i] == DOUBLE_QUOTE)
+		else if (pattern[i] == quote)
 		{
 			//Just skip everything thats in quotes
 			i++;
-			while (pattern[i] != DOUBLE_QUOTE && i < size)
+			while (pattern[i] != quote && i < size)
 			{
 				i++;
 			}
@@ -347,7 +347,7 @@ bool Expander::validate(const wstring &pattern)
 				loadBrackets++;
 			else if (pattern[i] == groupEnd)
 				loadBrackets--;
-			else if (pattern[i] == DOUBLE_QUOTE)
+			else if (pattern[i] == quote)
 				loadQuotes++;
 
 			if (loadBrackets < 0)
@@ -491,6 +491,10 @@ void Expander::loadConfig(const std::string& filePath)
 		{
 			setGroupEnd(val[0]);
 		}
+		else if (key == L"quote")
+		{
+			setQuote(val[0]);
+		}
 	}
 
 }
@@ -504,5 +508,6 @@ void Expander::saveConfig(const std::string& filePath)
 
 	out << L"group.begin " << getGroupBegin() << endl;
 	out << L"group.end " << getGroupEnd() << endl;
+	out << L"quote " << getQuote() << endl;
 
 }

@@ -13,10 +13,9 @@ namespace PatternExpander
 
 const wchar_t DEFAULT_ESC_SYM = '/';
 const wchar_t DEFAULT_RANGE_SYM = '-';
-const wchar_t GROUP_SYM_BEGIN = '[';
-const wchar_t GROUP_SYM_END = ']';
-const wchar_t SINGLE_QUOTE = '\'';
-const wchar_t DOUBLE_QUOTE = '"';
+const wchar_t DEFAULT_GROUP_BEGIN_SYM = '[';
+const wchar_t DEFAULT_GROUP_END_SYM = ']';
+const wchar_t DEFAULT_QUOTE_SYM = '"';
 
 class Expander
 {
@@ -25,8 +24,9 @@ public:
 	///Consructor
 	explicit Expander(wchar_t esc = PatternExpander::DEFAULT_ESC_SYM,
 			wchar_t range = PatternExpander::DEFAULT_RANGE_SYM,
-			wchar_t grpBegin = PatternExpander::GROUP_SYM_BEGIN,
-			wchar_t grpEnd = PatternExpander::GROUP_SYM_END);
+			wchar_t grpBegin = PatternExpander::DEFAULT_GROUP_BEGIN_SYM,
+			wchar_t grpEnd = PatternExpander::DEFAULT_GROUP_END_SYM,
+			wchar_t quote = PatternExpander::DEFAULT_QUOTE_SYM);
 
 	///The main function - it expands the pattern and generates are possible combinations
 	void generate(const std::wstring &pattern);
@@ -81,6 +81,15 @@ public:
 		groupEnd = in;
 	}
 
+	wchar_t getQuote() const
+	{
+		return quote;
+	}
+	void setQuote(wchar_t in)
+	{
+		quote = in;
+	}
+
 	std::vector<std::wstring> getData();
 
 	std::wstringstream output;
@@ -96,6 +105,8 @@ private:
 
 	wchar_t groupBegin;
 	wchar_t groupEnd;
+
+	wchar_t quote;
 
 	///the main data storage
 	std::vector<std::wstring> data;
