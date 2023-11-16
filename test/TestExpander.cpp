@@ -793,6 +793,55 @@ TEST_F(TestExpander, testGenerate_VariableBlock_EscQuote_OutsideGroup)
 
 }
 
+TEST_F(TestExpander, testLoadConfig)
+{
+	//If the file doesn't  exist the settings don't change
+	//Assuming that no ~/.patexpconfig exists, those will be the default values
+	underTest.loadConfig("./nofile.txt");
+
+	EXPECT_EQ(underTest.getEscChar(), PatternExpander::DEFAULT_ESC_SYM);
+	EXPECT_EQ(underTest.getGroupBegin(), PatternExpander::GROUP_SYM_BEGIN);
+	EXPECT_EQ(underTest.getGroupEnd(), PatternExpander::GROUP_SYM_END);
+	EXPECT_EQ(underTest.getRangeChar(), PatternExpander::DEFAULT_RANGE_SYM);
+
+	altExpander.loadConfig("./nofile.txt");
+	EXPECT_EQ(altExpander.getEscChar(), L'#');
+	EXPECT_EQ(altExpander.getGroupBegin(), L'{');
+	EXPECT_EQ(altExpander.getGroupEnd(), L'}');
+	EXPECT_EQ(altExpander.getRangeChar(), L'>');
+
+}
+
+TEST_F(TestExpander, testLoadConfig_altSettings)
+{
+	//Load the alt config file. All settings will change
+	underTest.loadConfig("test_data/altConfig.txt");
+
+	EXPECT_EQ(underTest.getEscChar(), L'#');
+	EXPECT_EQ(underTest.getGroupBegin(), L'{');
+	EXPECT_EQ(underTest.getGroupEnd(), L'}');
+	EXPECT_EQ(underTest.getRangeChar(), L'>');
+
+}
+
+TEST_F(TestExpander, testSaveConfig)
+{
+	//Save the alt config to file, then load it in the default expander
+	string configFileName = std::tmpnam(nullptr);
+
+	altExpander.saveConfig(configFileName);
+	underTest.loadConfig(configFileName);
+
+	EXPECT_EQ(underTest.getEscChar(), L'#');
+	EXPECT_EQ(underTest.getGroupBegin(), L'{');
+	EXPECT_EQ(underTest.getGroupEnd(), L'}');
+	EXPECT_EQ(underTest.getRangeChar(), L'>');
+
+
+}
+
+
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);

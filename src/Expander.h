@@ -85,6 +85,10 @@ public:
 
 	std::wstringstream output;
 
+	void loadConfig(const std::string& filePath="~/.patexpconfig");
+
+	void saveConfig(const std::string& filePath="~/.patexpconfig");
+
 private:
 	///used to escape other special symbols
 	wchar_t escapeSymbol;
