@@ -20,6 +20,7 @@ protected:
 		altExpander.setGroupBegin('{');
 		altExpander.setGroupEnd('}');
 		altExpander.setRangeChar('>');
+		altExpander.setQuote('^');
 	}
 };
 
@@ -36,6 +37,9 @@ TEST_F(TestExpander, testGetters)
 
 	result = underTest.getGroupEnd();
 	EXPECT_EQ(PatternExpander::DEFAULT_GROUP_END_SYM, result);
+
+	result = underTest.getQuote();
+	EXPECT_EQ(PatternExpander::DEFAULT_QUOTE_SYM, result);
 }
 
 TEST_F(TestExpander, testSetters)
@@ -58,6 +62,11 @@ TEST_F(TestExpander, testSetters)
 	input = '}';
 	underTest.setGroupEnd(input);
 	result = underTest.getGroupEnd();
+	EXPECT_EQ(input, result);
+
+	input = '^';
+	underTest.setQuote(input);
+	result = underTest.getQuote();
 	EXPECT_EQ(input, result);
 
 }
