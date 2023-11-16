@@ -838,6 +838,20 @@ TEST_F(TestExpander, testGenerate_VariableBlock_EscQuote_OutsideGroup)
 
 }
 
+TEST_F(TestExpander, testGenerate_VariableBlock_EscAltQuote_OutsideGroup)
+{
+	// /"[a-c]/" Since the queotes are escaped [a-c] is expanded and you end up with : "a" "b" "c"
+	wstring pattern = LR"(/'[a-c]/')";
+	underTest.setQuote('\'');
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	ASSERT_EQ(data.size(), 3);
+	ASSERT_EQ(data[0], L"'a'");
+	ASSERT_EQ(data[1], L"'b'");
+	ASSERT_EQ(data[2], L"'c'");
+
+}
+
 TEST_F(TestExpander, testLoadConfig)
 {
 	//If the file doesn't  exist the settings don't change
