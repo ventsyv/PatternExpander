@@ -818,6 +818,7 @@ TEST_F(TestExpander, testLoadConfig)
 	EXPECT_EQ(altExpander.getGroupBegin(), L'{');
 	EXPECT_EQ(altExpander.getGroupEnd(), L'}');
 	EXPECT_EQ(altExpander.getRangeChar(), L'>');
+	EXPECT_EQ(altExpander.getQuote(), L'^');
 
 }
 
@@ -830,6 +831,7 @@ TEST_F(TestExpander, testLoadConfig_altSettings)
 	EXPECT_EQ(underTest.getGroupBegin(), L'{');
 	EXPECT_EQ(underTest.getGroupEnd(), L'}');
 	EXPECT_EQ(underTest.getRangeChar(), L'>');
+	EXPECT_EQ(underTest.getQuote(), L'^');
 
 }
 
@@ -845,6 +847,7 @@ TEST_F(TestExpander, testSaveConfig)
 	EXPECT_EQ(underTest.getGroupBegin(), L'{');
 	EXPECT_EQ(underTest.getGroupEnd(), L'}');
 	EXPECT_EQ(underTest.getRangeChar(), L'>');
+	EXPECT_EQ(underTest.getQuote(), L'^');
 
 
 }

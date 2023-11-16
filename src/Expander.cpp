@@ -491,6 +491,10 @@ void Expander::loadConfig(const std::string& filePath)
 		{
 			setGroupEnd(val[0]);
 		}
+		else if (key == L"quote")
+		{
+			setQuote(val[0]);
+		}
 	}
 
 }
@@ -504,5 +508,6 @@ void Expander::saveConfig(const std::string& filePath)
 
 	out << L"group.begin " << getGroupBegin() << endl;
 	out << L"group.end " << getGroupEnd() << endl;
+	out << L"quote " << getQuote() << endl;
 
 }
