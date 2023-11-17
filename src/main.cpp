@@ -3,9 +3,12 @@
 #include <codecvt>
 #include <locale>
 #include <algorithm>
+#include <filesystem>
 #include "Expander.h"
 
 using namespace std;
+
+const string DEFAULT_CONFIG_FILE_NAME = ".pathexpconfig";
 
 void run_command(int argc, char *argv[])
 {
@@ -56,16 +59,63 @@ void run_command(int argc, char *argv[])
 	}
 }
 
+void setConfig(int argc, char *argv[], const string& filePath)
+{
+	PatternExpander::Expander exp;
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
+	int i = 2;
+	while (i < argc)
+	{
+		string option(argv[i++]);
+		if (i >= argc)
+		{
+			cerr << "Skipping option '" << option << "' - no value provided" << endl;
+			return;
+		}
+		string temp(argv[i++]);
+		wstring val =  wcu8.from_bytes(temp);
+		if (val.length() != 1)
+		{
+			cerr << "Skipping option '" << option << "' due to invalid value '" << temp << "'. Values are single characters only." << endl;
+			continue;
+		}
+
+		std::transform(option.begin(), option.end(), option.begin(),
+						::tolower);
+		if (option == "-q" || option == "--quote")
+			exp.setQuote(val[0]);
+		else if (option == "-e" || option == "--esc")
+			exp.setEscChar(val[0]);
+		else if (option == "-b" || option == "--group_begin" )
+			exp.setGroupBegin(val[0]);
+		else if (option == "-n" || option == "--group_end")
+			exp.setGroupEnd(val[0]);
+		else if (option == "-r" || option == "range")
+			exp.setRangeChar(val[0]);
+		else
+			cout << "Skipping unknown option: "<< option << endl;
+
+		exp.saveConfig(filePath);
+
+	}
+}
+
 int main(int argc, char *argv[])
 {
 
 	std::setlocale(LC_CTYPE, "C.UTF8");
 
-	wstring usage = LR"(usage: patexp [-h | --help] <command> [<args>]
+	string usage = R"(usage: patexp [-h | --help] <command> [<args>]
 	commands:
 	run [<pat1> <pat2> .. ] | <stdin> : Generates strings from a list of patterns
 	validate [<pat1> <pat2> .. ] | <stdin> : Validates if the patterns provided are syntaxically correct
-	configure: Sets the various configuration options)";
+	configure: Sets the various configuration options
+		-b, --group_begin <val> : Sets the group begin symbol. Default: '['
+		-e, --esc         <val> : Sets the escape symbol. Default: '/'
+		-q, --quote       <val> : Sets the quote symbols. Default: '"'
+		-n, --group_end   <val> : Sets the group end symbol. Default: ']'
+		-r, --range       <val> : Sets the range symbol. Default: '-'
+)";
 
 	if (argc > 1)
 	{
@@ -74,7 +124,7 @@ int main(int argc, char *argv[])
 				::tolower);
 		if (command == "-h" || command == "--help")
 		{
-			wcout << usage << endl;
+			cout << usage << endl;
 			exit(0);
 		}
 		else if (command == "run" || command == "validate")
@@ -84,21 +134,23 @@ int main(int argc, char *argv[])
 		}
 		else if (command == "config" || command == "configure")
 		{
-			wcout << "Configure is currently not implemented" << endl;
-			exit(1);
+			filesystem::path path(getenv("HOME"));
+			path.append(DEFAULT_CONFIG_FILE_NAME);
+
+			setConfig(argc, argv, path);
 		}
 		else
 		{
-			wcerr << "Error: unknown command" << endl;
-			wcout << usage << endl;
+			cerr << "Error: unknown command" << endl;
+			cout << usage << endl;
 		}
 
 	}
 	else
 	{
 		// command not provided
-		wcerr << "Error: no command was provided" << endl;
-		wcout << usage << endl;
+		cerr << "Error: no command was provided" << endl;
+		cout << usage << endl;
 	}
 
 	return 0;
