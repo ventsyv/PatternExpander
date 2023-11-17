@@ -510,4 +510,6 @@ void Expander::saveConfig(const std::string& filePath)
 	out << L"group.end " << getGroupEnd() << endl;
 	out << L"quote " << getQuote() << endl;
 
+	out.close();
+
 }

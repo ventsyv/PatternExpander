@@ -3,69 +3,31 @@
 #include <codecvt>
 #include <locale>
 #include <algorithm>
+#include <filesystem>
+#include "Helpers.h"
 #include "Expander.h"
 
 using namespace std;
 
-void run_command(int argc, char *argv[])
-{
-	wstring pattern;
-	PatternExpander::Expander exp;
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
+const string DEFAULT_CONFIG_FILE_NAME = ".pathexpconfig";
 
-	string command(argv[1]);
-	std::transform(command.begin(), command.end(), command.begin(), ::tolower);
-
-	if (argc > 2)
-	{
-		for (int currentParam = 2; currentParam < argc; currentParam++)
-		{
-			pattern = wcu8.from_bytes(argv[currentParam]);
-			if (command == "validate")
-			{
-				exp.validate(pattern);
-				wcerr << exp.output.str();
-			}
-			else if (command == "run")
-			{
-				exp.generate(pattern);
-			}
-
-		}
-		// Validate will not produce any data output
-		wcout << exp;
-	}
-	else
-	{
-		string temp;
-		while (cin >> temp)
-		{
-			pattern = wcu8.from_bytes(temp);
-			if (command == "validate")
-			{
-				exp.validate(pattern);
-				wcerr << exp.output.str();
-			}
-			else if (command == "run")
-			{
-				exp.generate(pattern);
-			}
-		}
-		// Validate will not produce any data output
-		wcout << exp;
-	}
-}
 
 int main(int argc, char *argv[])
 {
 
 	std::setlocale(LC_CTYPE, "C.UTF8");
 
-	wstring usage = LR"(usage: patexp [-h | --help] <command> [<args>]
+	string usage = R"(usage: patexp [-h | --help] <command> [<args>]
 	commands:
 	run [<pat1> <pat2> .. ] | <stdin> : Generates strings from a list of patterns
 	validate [<pat1> <pat2> .. ] | <stdin> : Validates if the patterns provided are syntaxically correct
-	configure: Sets the various configuration options)";
+	configure: Sets the various configuration options
+		-b, --group_begin <val> : Sets the group begin symbol. Default: '['
+		-e, --esc         <val> : Sets the escape symbol. Default: '/'
+		-q, --quote       <val> : Sets the quote symbols. Default: '"'
+		-n, --group_end   <val> : Sets the group end symbol. Default: ']'
+		-r, --range       <val> : Sets the range symbol. Default: '-'
+)";
 
 	if (argc > 1)
 	{
@@ -74,31 +36,36 @@ int main(int argc, char *argv[])
 				::tolower);
 		if (command == "-h" || command == "--help")
 		{
-			wcout << usage << endl;
+			cout << usage << endl;
 			exit(0);
 		}
 		else if (command == "run" || command == "validate")
 		{
-			run_command(argc, argv);
-
+			//The first arg is the name of the executable so start at the one after
+			run_command(argc - 1, argv + 1);
 		}
 		else if (command == "config" || command == "configure")
 		{
-			wcout << "Configure is currently not implemented" << endl;
-			exit(1);
+			filesystem::path path(getenv("HOME"));
+			path.append(DEFAULT_CONFIG_FILE_NAME);
+
+			//The first arg is the name of the executable
+			//The second argument is the name of the command (in this case "config")
+			//We need to skip both of those
+			setConfig(argc - 2, argv + 2, path);
 		}
 		else
 		{
-			wcerr << "Error: unknown command" << endl;
-			wcout << usage << endl;
+			cerr << "Error: unknown command" << endl;
+			cout << usage << endl;
 		}
 
 	}
 	else
 	{
 		// command not provided
-		wcerr << "Error: no command was provided" << endl;
-		wcout << usage << endl;
+		cerr << "Error: no command was provided" << endl;
+		cout << usage << endl;
 	}
 
 	return 0;

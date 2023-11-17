@@ -1,5 +1,5 @@
 EXE_FILE:=patexp
-SRC_FILES:= Expander.o
+SRC_FILES:= Expander.o Helpers.o
 MAIN_FILE:= main.o
 TEST_FILES:= TestExpander.o
 
