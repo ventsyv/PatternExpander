@@ -23,12 +23,12 @@ void run_command(int argc, char *argv[])
 	PatternExpander::Expander exp;
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
 
-	string command(argv[1]);
+	string command(argv[0]);
 	std::transform(command.begin(), command.end(), command.begin(), ::tolower);
 
-	if (argc > 2)
+	if (argc > 1)
 	{
-		for (int currentParam = 2; currentParam < argc; currentParam++)
+		for (int currentParam = 1; currentParam < argc; currentParam++)
 		{
 			pattern = wcu8.from_bytes(argv[currentParam]);
 			if (command == "validate")
@@ -70,7 +70,7 @@ void setConfig(int argc, char *argv[], const string& filePath)
 {
 	PatternExpander::Expander exp;
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
-	int i = 2;
+	int i = 0;
 	while (i < argc)
 	{
 		string option(argv[i++]);
@@ -101,8 +101,6 @@ void setConfig(int argc, char *argv[], const string& filePath)
 			exp.setRangeChar(val[0]);
 		else
 			cout << "Skipping unknown option: "<< option << endl;
-
-		exp.saveConfig(filePath);
-
 	}
+	exp.saveConfig(filePath);
 }

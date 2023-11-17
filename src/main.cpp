@@ -41,15 +41,18 @@ int main(int argc, char *argv[])
 		}
 		else if (command == "run" || command == "validate")
 		{
-			run_command(argc, argv);
-
+			//The first arg is the name of the executable so start at the one after
+			run_command(argc - 1, argv + 1);
 		}
 		else if (command == "config" || command == "configure")
 		{
 			filesystem::path path(getenv("HOME"));
 			path.append(DEFAULT_CONFIG_FILE_NAME);
 
-			setConfig(argc, argv, path);
+			//The first arg is the name of the executable
+			//The second argument is the name of the command (in this case "config")
+			//We need to skip both of those
+			setConfig(argc - 2, argv + 2, path);
 		}
 		else
 		{
