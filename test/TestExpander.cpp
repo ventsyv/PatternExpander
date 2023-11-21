@@ -967,6 +967,7 @@ TEST_F(TestExpander, testGenerate_NonAlphaNumRange)
 	underTest.generate(pattern);
 	auto data = underTest.getData();
 	ASSERT_EQ(data.size(), 0);
+	ASSERT_EQ(underTest.output.str(), L"Error: Invalid non alpha-numerical range found\n");
 }
 
 TEST_F(TestExpander, testValidate_NonAlphaNumRange)
@@ -975,6 +976,23 @@ TEST_F(TestExpander, testValidate_NonAlphaNumRange)
 	auto result = underTest.validate(pattern);
 	ASSERT_FALSE(result);
 	ASSERT_EQ(underTest.output.str(), L"Error: Invalid non alpha-numerical range found\n");
+}
+
+TEST_F(TestExpander, testValidate_InvalidRange)
+{
+	wstring pattern = L"1[a-";
+	auto result = underTest.validate(pattern);
+	ASSERT_FALSE(result);
+	ASSERT_EQ(underTest.output.str(), L"Error: Invalid range found\n");
+}
+
+TEST_F(TestExpander, testGenerate_InvalidRange)
+{
+	wstring pattern = L"1[a-";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	ASSERT_EQ(data.size(), 0);
+	ASSERT_EQ(underTest.output.str(), L"Error: Invalid range found\n");
 }
 
 
