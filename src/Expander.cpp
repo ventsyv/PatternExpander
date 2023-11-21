@@ -66,6 +66,9 @@ void Expander::generate(const wstring &pattern)
 {
 	vector<wstring> results;
 
+	if (!validate(pattern))
+		return;
+
 	//This will expand all range (a-b) expressions
 	wstring expandedPattern = expand(pattern);
 	size_t pLength = expandedPattern.length();
