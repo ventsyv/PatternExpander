@@ -942,6 +942,14 @@ TEST_F(TestExpander, testSetConfig)
 
 }
 
+TEST_F(TestExpander, testValidate_UnclosedQuote)
+{
+	wstring pattern = LR"(ab["1-3])";
+	bool result = underTest.validate(pattern);
+	ASSERT_FALSE(result);
+	ASSERT_EQ(underTest.output.str(), L"Error: Unclosed quote detected\n");
+}
+
 
 
 int main(int argc, char **argv)
