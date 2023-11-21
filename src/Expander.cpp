@@ -257,7 +257,7 @@ bool Expander::validate(const wstring &pattern)
 	int loadBrackets = 0;
 	uint loadQuotes = 0;
 
-	for (uint i = 0; i < pattern.size(); i++)
+	for (int i = 0; i < (int)pattern.size(); i++)
 	{
 
 		if (isEscSeq(pattern, i, loadBrackets > 0))
@@ -272,6 +272,30 @@ bool Expander::validate(const wstring &pattern)
 				loadBrackets--;
 			else if (pattern[i] == quote)
 				loadQuotes++;
+			else if (pattern[i] == rangeSymbol && loadBrackets > 0)
+			{
+				if (i - 1 < 0 || i + 1 >= (int)pattern.size())
+				{
+					output << "Error: Invalid range found"<<endl;
+					return false;
+				}
+
+				wchar_t startRange = pattern[i - 1];
+				wchar_t endRange = pattern[i + 1];
+
+				std::locale loc2("C.UTF8");
+
+				//if either the start on end character are not alphanumeric return an error
+				if ((!isalpha(startRange, loc2) && !isdigit(startRange, loc2))
+						|| (!isalpha(endRange, loc2) && !isdigit(endRange, loc2)))
+				{
+					output << "Error: Invalid non alpha-numerical range found"<<endl;
+					return false;
+				}
+
+
+
+			}
 
 			if (loadBrackets < 0)
 			{

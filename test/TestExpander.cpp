@@ -961,6 +961,22 @@ TEST_F(TestExpander, testGenerate_ReverseOrderRange)
 	ASSERT_EQ(data[2], L"1a");
 }
 
+TEST_F(TestExpander, testGenerate_NonAlphaNumRange)
+{
+	wstring pattern = L"1[*-%]";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	ASSERT_EQ(data.size(), 0);
+}
+
+TEST_F(TestExpander, testValidate_NonAlphaNumRange)
+{
+	wstring pattern = L"1[*-%]";
+	auto result = underTest.validate(pattern);
+	ASSERT_FALSE(result);
+	ASSERT_EQ(underTest.output.str(), L"Error: Invalid non alpha-numerical range found\n");
+}
+
 
 
 int main(int argc, char **argv)
