@@ -12,6 +12,7 @@ Expander::Expander(wchar_t esc, wchar_t range, wchar_t grpBegin, wchar_t grpEnd,
 		escapeSymbol(esc), rangeSymbol(range), groupBegin(grpBegin), groupEnd(
 				grpEnd), quote(quote)
 {
+	//If the config file exists, load it. If it does not, the constructor arguments are used
 	loadConfig();
 }
 
@@ -66,25 +67,25 @@ void Expander::generate(const wstring &pattern)
 {
 	vector<wstring> results;
 
+	//Check if the pattern is valid
 	if (!validate(pattern))
 		return;
 
 	//This will expand all range (a-b) expressions
 	wstring expandedPattern = expand(pattern);
 	size_t pLength = expandedPattern.length();
-	if (pLength == 0)
-	{
-		return;
-	}
 
-	//Increment when unescaped [ is reached, decrement when ]
+	//Increment when un-escaped [ is reached, decrement when ]
 	uint load = 0;
+	//Flag that indicates an escape sequence has been reached
 	bool escSeqReached = false;
 
-	//When entering a new group, the partial patters are saved off in temp
+	//Flags indicates that we've entered a new group.
 	bool isFirstInGroup = true;
+	//When entering a new group, the partial patterns are saved off in temp variable
 	vector<wstring> partials;
 
+	//Loop over the epanded pattern
 	for (uint i = 0; i < pLength; i++)
 	{
 		//check if a new escape sequence is reached
@@ -97,18 +98,18 @@ void Expander::generate(const wstring &pattern)
 			}
 
 		}
-		else if (expandedPattern[i] == groupBegin && !escSeqReached)
+		else if (expandedPattern[i] == groupBegin && !escSeqReached) //un-escaped group start reached
 		{
 			isFirstInGroup = true;
 			load++;
 			continue;
 		}
-		else if (expandedPattern[i] == groupEnd && !escSeqReached)
+		else if (expandedPattern[i] == groupEnd && !escSeqReached) //un-escaped group end reached
 		{
 			load--;
 			continue;
 		}
-		else if (expandedPattern[i] == quote && !escSeqReached)
+		else if (expandedPattern[i] == quote && !escSeqReached) //un-escaped string literal reached
 		{
 			//Just skip everything thats in quotes
 			uint startIndex = ++i;
@@ -171,7 +172,7 @@ inline bool Expander::isEscSeq(const std::wstring &pattern, uint position, bool 
 		{
 			result = false;
 		}
-}
+	}//end if
 	return result;
 }
 
@@ -206,7 +207,7 @@ std::wstring Expander::expand(const std::wstring &pattern)
 		{
 			load--;
 		}
-		else if (pattern[i] == rangeSymbol && load > 0) //range symbol reached
+		else if (pattern[i] == rangeSymbol && load > 0) //range symbol reached. Ranges are valid in groups only, not in static portions of the pattern
 		{
 			expanded = L"";
 			if (i - 1 < 0 || i + 1 >= size)
@@ -244,10 +245,8 @@ std::wstring Expander::expand(const std::wstring &pattern)
 					return L""; //range does not seem valid
 				result = preStr + expanded + postStr;
 				size = pattern.length();
-				//i += 2;
 			}
 		}
-		//result = "";
 	} //end for
 
 	if (result == L"")
@@ -265,7 +264,7 @@ bool Expander::validate(const wstring &pattern)
 
 		if (isEscSeq(pattern, i, loadBrackets > 0))
 		{
-			i++;
+			i++;//escape sequence - just keep going
 		}
 		else
 		{
@@ -275,7 +274,7 @@ bool Expander::validate(const wstring &pattern)
 				loadBrackets--;
 			else if (pattern[i] == quote)
 				loadQuotes++;
-			else if (pattern[i] == rangeSymbol && loadBrackets > 0)
+			else if (pattern[i] == rangeSymbol && loadBrackets > 0) //range symbol reached. Ranges are valid in groups only, not in static portions of the pattern
 			{
 				if (i - 1 < 0 || i + 1 >= (int)pattern.size())
 				{
@@ -289,15 +288,14 @@ bool Expander::validate(const wstring &pattern)
 				std::locale loc2("C.UTF8");
 
 				//if either the start on end character are not alphanumeric return an error
+				//This might need to be removed if support for East Asian languages is ever to be added
+				//Not sure how that works in logographic languages
 				if ((!isalpha(startRange, loc2) && !isdigit(startRange, loc2))
 						|| (!isalpha(endRange, loc2) && !isdigit(endRange, loc2)))
 				{
 					output << "Error: Invalid non alpha-numerical range found"<<endl;
 					return false;
 				}
-
-
-
 			}
 
 			if (loadBrackets < 0)
