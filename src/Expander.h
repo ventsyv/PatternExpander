@@ -111,33 +111,12 @@ private:
 	///the main data storage
 	std::vector<std::wstring> data;
 
-	///Used to find all opening / closing brackets
-	//	std::vector<uint> findAllInstances(const std::wstring& target, const std::wstring& item);
-
 	//Looks for any ranges and expands them
 	std::wstring expand(const std::wstring &pattern);
 
 	///Returns true if a valid escape sequence is present at the given position
 	bool isEscSeq(const std::wstring &pattern, uint position, bool isInGroup) const;
 
-	/**A character set is a group of characters surrounded by []
-	 * Characters can be listed individually - [abc]
-	 * or as a range [a-c]. Special characters lose their meaning inside a set
-	 */
-	std::vector<std::wstring> handleCharacterSet(const std::wstring &pattern,
-			uint);
-
-	/***
-	 *
-	 */
-	uint getBlockElements(const std::wstring &pattern, uint &start,
-			std::vector<std::wstring> &items);
-
-	void getCombinations(std::vector<std::wstring> &data,
-			std::vector<std::wstring> &newElements);
-	void processGroup(const std::wstring &pattern, uint &i, uint &currentItem);
-
-	bool getLoadBalance(const std::wstring &pattern);
 	void append(std::vector<std::wstring> &results,
 			const std::wstring &newData);
 	void appendGroup(bool &isFirstInGroup, const std::wstring &newData, std::vector<std::wstring> &partials, std::vector<std::wstring> &results);
