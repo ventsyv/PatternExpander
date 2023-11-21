@@ -950,6 +950,17 @@ TEST_F(TestExpander, testValidate_UnclosedQuote)
 	ASSERT_EQ(underTest.output.str(), L"Error: Unclosed quote detected\n");
 }
 
+TEST_F(TestExpander, testGenerate_ReverseOrderRange)
+{
+	wstring pattern = L"1[c-a]";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	ASSERT_EQ(data.size(), 3);
+	ASSERT_EQ(data[0], L"1c");
+	ASSERT_EQ(data[1], L"1b");
+	ASSERT_EQ(data[2], L"1a");
+}
+
 
 
 int main(int argc, char **argv)
