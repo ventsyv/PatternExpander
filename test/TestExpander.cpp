@@ -942,6 +942,59 @@ TEST_F(TestExpander, testSetConfig)
 
 }
 
+TEST_F(TestExpander, testValidate_UnclosedQuote)
+{
+	wstring pattern = LR"(ab["1-3])";
+	bool result = underTest.validate(pattern);
+	ASSERT_FALSE(result);
+	ASSERT_EQ(underTest.output.str(), L"Error: Unclosed quote detected\n");
+}
+
+TEST_F(TestExpander, testGenerate_ReverseOrderRange)
+{
+	wstring pattern = L"1[c-a]";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	ASSERT_EQ(data.size(), 3);
+	ASSERT_EQ(data[0], L"1c");
+	ASSERT_EQ(data[1], L"1b");
+	ASSERT_EQ(data[2], L"1a");
+}
+
+TEST_F(TestExpander, testGenerate_NonAlphaNumRange)
+{
+	wstring pattern = L"1[*-%]";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	ASSERT_EQ(data.size(), 0);
+	ASSERT_EQ(underTest.output.str(), L"Error: Invalid non alpha-numerical range found\n");
+}
+
+TEST_F(TestExpander, testValidate_NonAlphaNumRange)
+{
+	wstring pattern = L"1[*-%]";
+	auto result = underTest.validate(pattern);
+	ASSERT_FALSE(result);
+	ASSERT_EQ(underTest.output.str(), L"Error: Invalid non alpha-numerical range found\n");
+}
+
+TEST_F(TestExpander, testValidate_InvalidRange)
+{
+	wstring pattern = L"1[a-";
+	auto result = underTest.validate(pattern);
+	ASSERT_FALSE(result);
+	ASSERT_EQ(underTest.output.str(), L"Error: Invalid range found\n");
+}
+
+TEST_F(TestExpander, testGenerate_InvalidRange)
+{
+	wstring pattern = L"1[a-";
+	underTest.generate(pattern);
+	auto data = underTest.getData();
+	ASSERT_EQ(data.size(), 0);
+	ASSERT_EQ(underTest.output.str(), L"Error: Invalid range found\n");
+}
+
 
 
 int main(int argc, char **argv)

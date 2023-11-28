@@ -2,8 +2,9 @@
 
 Given a pattern, generate all possible combinations.
 
-Pattern Expander was intended as password recovery tool where the password follows a certain pattern.
-It uses UTF-8 and has been tested with Cyrillic, but it shoud be able to support other alphabets as well.
+Pattern Expander was intended as tool to help password recovery where the password follows a certain pattern.
+The user would provide a pattern and PatternExpander would generate all possible passwords. Those can then be used to brute force the password.
+ 
 
 For example `p[a@][s$][s$]` will result in:
 
@@ -17,6 +18,8 @@ p@s$
 pa$$
 p@$$
 ```
+
+It uses UTF-8 and has been tested with Cyrillic, but it shoud be able to support other alphabets as well.
 
 
 ## Installation
@@ -39,7 +42,7 @@ Clone the repo, cd into the source directory and run the following
 make
 ```
 
-You don't need to install patext, after building, you can run it from the the `./bin/` folder
+You don't need to install PatternExpander, after building, you can run it from the the `./bin/` folder
 but if you want it to be in the path `sudo make install` will copy it to `/usr/local/bin`
 
 ## Usage
@@ -48,10 +51,21 @@ patexp [-h | --help] <command> [<args>]
 		commands:
 			run [<pat1> <pat2> .. ] | <stdin> : Generates strings from a list of patterns
 			validate [<pat1> <pat2> .. ] | <stdin> : Validates if the patterns provided are syntaxically correct
-			configure: Sets the various configuration options <Not yet implemented>
+			configure: Sets the various configuration options
+				[-b, --group_begin <val>] : Sets the group begin symbol. Default: '['
+				[-e, --esc         <val>] : Sets the escape symbol. Default: '/'
+				[-q, --quote       <val>] : Sets the quote symbols. Default: '"'
+				[-n, --group_end   <val>] : Sets the group end symbol. Default: ']'
+				[-r, --range       <val>] : Sets the range symbol. Default: '-'
 ```
 
-### Examples
+
+### Run
+
+Run loops over the provided patters and generates all possible outputs for each. 
+Generally, invalid patterns are skipped and PatternExpander proceeds with the next pattern.
+The Run sub-command aceepts patters as arguments or via stdin. Patterns are space delimited.
+If you have to have spaces or (other special characters such as quotes) in your patterns, you need to make sure they are properly escaped.
 
 Assuming you have compiled and running out of the local bin folder:
 
@@ -85,6 +99,33 @@ abc3
 
 ```
 
+For more examples see the Syntax section.
+
+### Validate
+
+Similarly to run, validate loops over the provided patters and generates does basic validation for each.
+Errors are outputed to stderr. 
+The Validate sub-command aceepts patters as arguments or via stdin. Patterns are space delimited.
+If you have to have spaces or (other special characters such as quotes) in your patterns, you need to make sure they are properly escaped.
+
+Assuming you have compiled and running out of the local bin folder:
+
+```sh
+$/bin/patexpd validate ]]a-c
+Error: Invalid group sequence detected
+]]a-c
+^
+```
+
+### Configure
+
+Configure is used to set the various reserved characters used by PatternExpander.
+Configure stores those value in `$HOME/.patexpconfig`
+If that file exists, the values are loaded from it. If it does not, the default values are assumed (see Usage for more details).
+All configuration settings are optional - if not provided the existing setting will remain unchanged.
+
+Note: Calling the configure sub-command overrides (or creates) the .patexpconfig file.
+
 
 ## Syntax
 
@@ -97,13 +138,15 @@ Any unadorned strings are considered static. For example given the pattern
 	Result: "abcd"
 
 ### Groups:
-A group is a group of characters that are possible  at the given position
+A group is a group of characters that are possible at the given position
 - [abc] - Substitubes one each of the listed symbols at the given position
 - [a-z] - Range. Expands to be equivalend to [a...z] works for numeric values as well ( [0-9] only )
 - [z-a] - Range. Expands to be equivalend to [z...a] works for numeric values as well ( [0-9] only )
 
 
 #### Examples
+For brevity, the resuls are shown as comma separated values, but in reality there will be line ending after each (and no commas)
+
 	Pattern: "[abc]"
 	Result: a, b, c
 

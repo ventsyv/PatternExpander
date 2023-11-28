@@ -11,6 +11,7 @@ typedef unsigned int uint;
 namespace PatternExpander
 {
 
+// Default reserved symbols. Those can be changed via the set methods
 const wchar_t DEFAULT_ESC_SYM = '/';
 const wchar_t DEFAULT_RANGE_SYM = '-';
 const wchar_t DEFAULT_GROUP_BEGIN_SYM = '[';
@@ -21,17 +22,31 @@ class Expander
 {
 public:
 
-	///Consructor
+	/**
+	 * Constructor with default values allows the Expander class to be configured at construction time
+	 * @param esc      - the escape symbol. Default: DEFAULT_ESC_SYM
+	 * @param range    - the range symbol. Default: DEFAULT_RANGE_SYM
+	 * @param grpBegin - the group begin symbol. Default: DEFAULT_GROUP_BEGIN_SYM
+	 * @param grpEnd   - the group end symbol. Default: DEFAULT_GROUP_END_SYM
+	 * @param quote    - the quote symbol. Default: DEFAULT_QUOTE_SYM
+	 */
 	explicit Expander(wchar_t esc = PatternExpander::DEFAULT_ESC_SYM,
 			wchar_t range = PatternExpander::DEFAULT_RANGE_SYM,
 			wchar_t grpBegin = PatternExpander::DEFAULT_GROUP_BEGIN_SYM,
 			wchar_t grpEnd = PatternExpander::DEFAULT_GROUP_END_SYM,
 			wchar_t quote = PatternExpander::DEFAULT_QUOTE_SYM);
 
-	///The main function - it expands the pattern and generates are possible combinations
+	/**
+	 * The main function - it expands the pattern and generates are possible combinations
+	 * @param pattern - the pattern to be processed
+	 */
 	void generate(const std::wstring &pattern);
 
-	///Validate the pattern
+	/**
+	 * Validates the provided pattern. Returns false if pattern is invalid
+	 * Writes an error message to the output stream (see below)
+	 * @param pattern - the pattern to be processed
+	 */
 	bool validate(const std::wstring &pattern);
 
 	///prints out all generated patterns
@@ -90,12 +105,23 @@ public:
 		quote = in;
 	}
 
+
+	/// Returns the set of generated patterns
 	std::vector<std::wstring> getData();
 
+	///The error stream. Used by the validate method to write error messages
 	std::wstringstream output;
 
+	/**
+	 * Loads the reserved symbols from a file.
+	 * @param filePath: Default config file is ~/.patexpconfig
+	 */
 	void loadConfig(const std::string& filePath="~/.patexpconfig");
 
+	/**
+	 * Writes the reserved symbols to a file
+	 * @param filePath: Default config file is ~/.patexpconfig
+	 */
 	void saveConfig(const std::string& filePath="~/.patexpconfig");
 
 private:
@@ -111,35 +137,33 @@ private:
 	///the main data storage
 	std::vector<std::wstring> data;
 
-	///Used to find all opening / closing brackets
-	//	std::vector<uint> findAllInstances(const std::wstring& target, const std::wstring& item);
-
-	//Looks for any ranges and expands them
+	/**
+	 * Looks for any ranges in the given pattern and expands them.
+	 * For example: a[1-3] will return a[123] and 1[c-a] will return 1[cba]
+	 */
 	std::wstring expand(const std::wstring &pattern);
 
 	///Returns true if a valid escape sequence is present at the given position
 	bool isEscSeq(const std::wstring &pattern, uint position, bool isInGroup) const;
 
-	/**A character set is a group of characters surrounded by []
-	 * Characters can be listed individually - [abc]
-	 * or as a range [a-c]. Special characters lose their meaning inside a set
+	/**
+	 * Appends a static string to all existing results. Usually this wil be a single character at a time
+	 * @param results - the existing result from expanding the pattern so far
+	 * @param newData - the newly added string
 	 */
-	std::vector<std::wstring> handleCharacterSet(const std::wstring &pattern,
-			uint);
-
-	/***
-	 *
-	 */
-	uint getBlockElements(const std::wstring &pattern, uint &start,
-			std::vector<std::wstring> &items);
-
-	void getCombinations(std::vector<std::wstring> &data,
-			std::vector<std::wstring> &newElements);
-	void processGroup(const std::wstring &pattern, uint &i, uint &currentItem);
-
-	bool getLoadBalance(const std::wstring &pattern);
 	void append(std::vector<std::wstring> &results,
 			const std::wstring &newData);
+
+	/**
+	 * Appends strings from a group to the existing results.
+	 * For example, if the pattern is abc[123], the [123] will be appended by this function.
+	 * The first time the function is ran the pre-existing results need to be saved (in this example abc)
+	 * Each item in the group is added to the partials, then all of them are added to the result set
+	 * @param isFirstInGroup - boolean flag to check if we are starting to process a new group.
+	 * @param newData - the strings that need to be appended. In this example, this will be 1,2,3
+	 * @param partials - the pre-existing results before the group begins processing
+	 * @param results - the combined results after each item is added
+	 */
 	void appendGroup(bool &isFirstInGroup, const std::wstring &newData, std::vector<std::wstring> &partials, std::vector<std::wstring> &results);
 };
 

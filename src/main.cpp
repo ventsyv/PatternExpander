@@ -22,11 +22,11 @@ int main(int argc, char *argv[])
 	run [<pat1> <pat2> .. ] | <stdin> : Generates strings from a list of patterns
 	validate [<pat1> <pat2> .. ] | <stdin> : Validates if the patterns provided are syntaxically correct
 	configure: Sets the various configuration options
-		-b, --group_begin <val> : Sets the group begin symbol. Default: '['
-		-e, --esc         <val> : Sets the escape symbol. Default: '/'
-		-q, --quote       <val> : Sets the quote symbols. Default: '"'
-		-n, --group_end   <val> : Sets the group end symbol. Default: ']'
-		-r, --range       <val> : Sets the range symbol. Default: '-'
+		[-b, --group_begin <val>] : Sets the group begin symbol. Default: '['
+		[-e, --esc         <val>] : Sets the escape symbol. Default: '/'
+		[-q, --quote       <val>] : Sets the quote symbols. Default: '"'
+		[-n, --group_end   <val>] : Sets the group end symbol. Default: ']'
+		[-r, --range       <val>] : Sets the range symbol. Default: '-'
 )";
 
 	if (argc > 1)
