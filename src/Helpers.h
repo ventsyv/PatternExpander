@@ -10,8 +10,8 @@
 
 #include <string>
 
-void run_command(int argc, char *argv[]);
-
+void execute_run_command(int argc, char *argv[]);
+void execute_validate_command(int argc, char *argv[]);
 void setConfig(int argc, char *argv[], const std::string& filePath);
 
 

@@ -17,29 +17,18 @@ using namespace std;
 
 
 
-void run_command(int argc, char *argv[])
+void execute_run_command(int argc, char *argv[])
 {
 	wstring pattern;
 	PatternExpander::Expander exp;
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
-
-	string command(argv[0]);
-	std::transform(command.begin(), command.end(), command.begin(), ::tolower);
 
 	if (argc > 1)
 	{
 		for (int currentParam = 1; currentParam < argc; currentParam++)
 		{
 			pattern = wcu8.from_bytes(argv[currentParam]);
-			if (command == "validate")
-			{
-				exp.validate(pattern);
-				wcerr << exp.output.str();
-			}
-			else if (command == "run")
-			{
-				exp.generate(pattern);
-			}
+			exp.generate(pattern);
 
 		}
 		// Validate will not produce any data output
@@ -51,15 +40,38 @@ void run_command(int argc, char *argv[])
 		while (cin >> temp)
 		{
 			pattern = wcu8.from_bytes(temp);
-			if (command == "validate")
-			{
-				exp.validate(pattern);
-				wcerr << exp.output.str();
-			}
-			else if (command == "run")
-			{
-				exp.generate(pattern);
-			}
+			exp.generate(pattern);
+		}
+		// Validate will not produce any data output
+		wcout << exp;
+	}
+}
+
+void execute_validate_command(int argc, char *argv[])
+{
+	wstring pattern;
+	PatternExpander::Expander exp;
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
+
+	if (argc > 1)
+	{
+		for (int currentParam = 1; currentParam < argc; currentParam++)
+		{
+			pattern = wcu8.from_bytes(argv[currentParam]);
+			exp.validate(pattern);
+			wcerr << exp.output.str();
+		}
+		// Validate will not produce any data output
+		wcout << exp;
+	}
+	else
+	{
+		string temp;
+		while (cin >> temp)
+		{
+			pattern = wcu8.from_bytes(temp);
+			exp.validate(pattern);
+			wcerr << exp.output.str();
 		}
 		// Validate will not produce any data output
 		wcout << exp;
@@ -97,7 +109,7 @@ void setConfig(int argc, char *argv[], const string& filePath)
 			exp.setGroupBegin(val[0]);
 		else if (option == "-n" || option == "--group_end")
 			exp.setGroupEnd(val[0]);
-		else if (option == "-r" || option == "--range")
+		else if (option == "-r" || option == "range")
 			exp.setRangeChar(val[0]);
 		else
 			cout << "Skipping unknown option: "<< option << endl;
