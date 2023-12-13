@@ -23,9 +23,9 @@ void execute_run_command(int argc, char *argv[])
 	PatternExpander::Expander exp;
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
 
-	if (argc > 1)
+	if (argc > 0)
 	{
-		for (int currentParam = 1; currentParam < argc; currentParam++)
+		for (int currentParam = 0; currentParam < argc; currentParam++)
 		{
 			pattern = wcu8.from_bytes(argv[currentParam]);
 			exp.generate(pattern);
@@ -53,9 +53,9 @@ void execute_validate_command(int argc, char *argv[])
 	PatternExpander::Expander exp;
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
 
-	if (argc > 1)
+	if (argc > 0)
 	{
-		for (int currentParam = 1; currentParam < argc; currentParam++)
+		for (int currentParam = 0; currentParam < argc; currentParam++)
 		{
 			pattern = wcu8.from_bytes(argv[currentParam]);
 			exp.validate(pattern);
