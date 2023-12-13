@@ -97,7 +97,7 @@ void setConfig(int argc, char *argv[], const string& filePath)
 			exp.setGroupBegin(val[0]);
 		else if (option == "-n" || option == "--group_end")
 			exp.setGroupEnd(val[0]);
-		else if (option == "-r" || option == "range")
+		else if (option == "-r" || option == "--range")
 			exp.setRangeChar(val[0]);
 		else
 			cout << "Skipping unknown option: "<< option << endl;
