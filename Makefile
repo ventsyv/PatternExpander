@@ -1,7 +1,7 @@
 EXE_FILE:=patexp
 SRC_FILES:= Expander.o Helpers.o
 MAIN_FILE:= main.o
-TEST_FILES:= TestExpander.o
+TEST_FILES:= TestExpander.o TestHelpers.o
 
 # Build directories - allows for separate release and debug executables
 DEBUG_DIR = build/debug

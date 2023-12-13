@@ -39,10 +39,15 @@ int main(int argc, char *argv[])
 			cout << usage << endl;
 			exit(0);
 		}
-		else if (command == "run" || command == "validate")
+		else if (command == "run")
 		{
 			//The first arg is the name of the executable so start at the one after
-			run_command(argc - 1, argv + 1);
+			execute_run_command(argc - 1, argv + 1);
+		}
+		else if (command == "validate")
+		{
+			execute_validate_command(argc - 1, argv + 1)
+
 		}
 		else if (command == "config" || command == "configure")
 		{
